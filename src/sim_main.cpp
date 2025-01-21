@@ -26,7 +26,6 @@ void simClock(int i = 1) {
         top->eval();
         top->i_Clk = 0;
         top->eval();
-        cout << "yeet\n";
     }
 }
 

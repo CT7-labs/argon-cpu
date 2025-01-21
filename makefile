@@ -6,10 +6,10 @@ HDL_DIR = hdl
 SRC_DIR = src
 OBJ_DIR = obj_dir
 
-# Find all Verilog files in hdl directory
-VERILOG_FILES := $(wildcard $(HDL_DIR)/*.v)
+# Find all SystemVerilog files in hdl directory
+VERILOG_FILES := $(wildcard $(HDL_DIR)/*.sv)
 
-# Main module name (change this to your top module)
+# top module name
 TOP_MODULE = SimTop
 
 # C++ source in src directory

@@ -15,21 +15,12 @@ module ArgonALU (
     input i_outputF);
     
     // registers
-    reg [15:0] rA, rB, rY, rFlags;
-    reg [3:0] rOp;
-    reg [16:0] rTemporary;
-    wire [16:0] wResult;
+    logic [15:0] rA, rB, rY, rFlags;
+    logic [3:0] rOp;
+    logic [16:0] rTemporary;
+    logic [16:0] wResult;
 
     assign wResult = rTemporary;
-
-    wire w_carry;
-    wire w_zero;
-    wire w_equal;
-    wire w_greater;
-    wire w_less;
-    wire w_rfu;
-    wire w_rfu;
-    wire w_rfu;
     
     // operation constants
     parameter OP_ADD        = 4'h0;
@@ -60,11 +51,11 @@ module ArgonALU (
     parameter F_RFU2         = 7; // reserved for future use
 
     // 17-bit zero-extended wires for operands
-    wire [16:0] wA = {1'b0, rA};
-    wire [16:0] wB = {1'b0, rB};
+    logic [16:0] wA = {1'b0, rA};
+    logic [16:0] wB = {1'b0, rB};
 
     // Combinational block for ALU operations
-    always @(*) begin
+    always_comb begin
         case (rOp)
             OP_ADD: begin
                 rTemporary = wA + wB;
@@ -123,14 +114,14 @@ module ArgonALU (
     end
 
     // combinatational block for flags
-    wire w_carry = rTemporary[16];
-    wire w_zero = (rTemporary[15:0] == 0);
-    wire w_equal = (rA == rB);
-    wire w_greater = (rA > rB);
-    wire w_less = (rA < rB);
-    wire w_borrow = (rTemporary[16]);
+    logic w_carry = rTemporary[16];
+    logic w_zero = (rTemporary[15:0] == 0);
+    logic w_equal = (rA == rB);
+    logic w_greater = (rA > rB);
+    logic w_less = (rA < rB);
+    logic w_borrow = (rTemporary[16]);
 
-    always @(posedge i_Clk or posedge i_Reset) begin
+    always_ff @(posedge i_Clk or posedge i_Reset) begin
         // handle reset
         if (i_Reset) begin
             rA <= 0;

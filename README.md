@@ -1,6 +1,6 @@
 # argon-cpu
 
-16-bit CPU implemented in standard Verilog.
+16-bit CPU implemented in SystemVerilog.
 
 # Features
 - 16 registers (including zero, flags, control, and stack pointer)
