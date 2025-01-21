@@ -32,7 +32,7 @@ package argon_pkg;
     parameter F_EQUAL       = 2;
     parameter F_GREATER     = 3;
     parameter F_LESS        = 4;
-    parameter F_BORROW      = 5;
+    parameter F_BORROW      = 5; // not 100% necessary
     parameter F_RFU1         = 6; // reserved for future use
     parameter F_RFU2         = 7; // reserved for future use
 

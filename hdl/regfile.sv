@@ -1,19 +1,9 @@
-/*
-Register file 15x 16-bit registers and a zero register
-
-r0      Zero register
-r1-15   General-purpose registers
-*/
-
 import argon_pkg::*;
 
 module ArgonRegFile (
-    // master ports
     input i_Clk,
     input i_Reset,
-    input [15:0] i_bus,
-    output logic [15:0] o_bus,
-    output o_bus_valid,
+    bus_if bus,
 
     // control wires
     input i_selectLatch,
@@ -21,12 +11,11 @@ module ArgonRegFile (
     input i_outputB,
     input i_latchC);
 
-    // let external circuitry know when the regfile is outputing data
-    assign o_bus_valid = i_outputA | i_outputB;
-
     // define register file and index registers
     word_t [15:0] regfile [1:REGISTERS-1];
     logic [3:0] indexA, indexB, indexC;
+
+    assign bus.valid = i_outputA | i_outputB;
 
     always_ff @(posedge i_Clk or posedge i_Reset) begin
         if (i_Reset) begin
@@ -43,21 +32,20 @@ module ArgonRegFile (
         else begin
             // latch into index select registers
             if (i_selectLatch) begin
-                indexA <= i_bus[3:0];
-                indexB <= i_bus[7:4];
-                indexC <= i_bus[11:8];
+                indexA <= bus.i_data[3:0];
+                indexB <= bus.i_data[7:4];
+                indexC <= bus.i_data[11:8];
             end
 
             // output proper registers
             else if (i_outputA)
-                o_bus <= (indexA == 0) ? 16'h0000 : regfile[indexA];
+                bus.o_data <= (indexA == 0) ? 16'h0000 : regfile[indexA];
             else if (i_outputB)
-                o_bus <= (indexB == 0) ? 16'h0000 : regfile[indexB];
+                bus.o_data <= (indexB == 0) ? 16'h0000 : regfile[indexB];
 
             // latch C
             else if (i_latchC && indexC != 0)
-                regfile[indexC] <= i_bus;
+                regfile[indexC] <= bus.i_data;
         end
     end
-    
 endmodule

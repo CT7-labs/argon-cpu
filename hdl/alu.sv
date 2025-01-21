@@ -4,9 +4,7 @@ module ArgonALU (
     // master I/O
     input i_Clk,
     input i_Reset,
-    input word_t i_bus,
-    output word_t o_bus,
-    output o_bus_valid,
+    bus_if bus,
 
     // control wires (ALU)
     input i_latchA,
@@ -109,16 +107,16 @@ module ArgonALU (
         else begin
             // handle writing to the ALU
             if (i_latchA) begin
-                rA <= i_bus;
+                rA <= bus.i_data;
             end
             else if (i_latchB) begin
-                rB <= i_bus;
+                rB <= bus.i_data;
             end
             else if (i_latchF) begin
-                rFlags <= i_bus[15:0];
+                rFlags <= bus.i_data;
             end
             else if (i_latchOp) begin
-                rALU <= i_bus[3:0];
+                rALU <= bus.i_data[3:0];
             end
 
             // update registers
@@ -149,9 +147,9 @@ module ArgonALU (
     end
 
     // handle reading from the ALU
-    assign o_bus = i_outputY ? rY :
+    assign bus.o_data = i_outputY ? rY :
                     i_outputF ? rFlags :
                     16'h0000;
 
-    assign o_bus_valid = i_outputY | i_outputF;
+    assign bus.valid = i_outputY | i_outputF;
 endmodule
