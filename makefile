@@ -3,11 +3,18 @@ TRACE ?= 0
 
 # Directory structure
 HDL_DIR = hdl
-SRC_DIR = src
+SRC_DIR = sim
 OBJ_DIR = obj_dir
+PKG_DIR = hdl/pkg
 
-# Find all SystemVerilog files in hdl directory
+# Find SystemVerilog files
+PKG_FILES := $(wildcard $(PKG_DIR)/*.sv)
 VERILOG_FILES := $(wildcard $(HDL_DIR)/*.sv)
+
+# Debug prints
+$(info PKG_DIR = $(PKG_DIR))
+$(info PKG_FILES = $(PKG_FILES))
+$(info VERILOG_FILES = $(VERILOG_FILES))
 
 # top module name
 TOP_MODULE = SimTop
@@ -36,12 +43,13 @@ $(shell mkdir -p $(SRC_DIR))
 all: $(EXECUTABLE)
 
 # Verilate and build
-$(EXECUTABLE): $(VERILOG_FILES) $(CPP_SRC)
+$(EXECUTABLE): $(PKG_FILES) $(VERILOG_FILES) $(CPP_SRC)
 	@echo "Building $(EXECUTABLE)..."
 	verilator $(VERILATOR_FLAGS) \
 		-CFLAGS "-std=c++11" \
 		--top-module $(TOP_MODULE) \
 		--Mdir $(OBJ_DIR) \
+		$(PKG_FILES) \
 		$(VERILOG_FILES) \
 		$(CPP_SRC)
 	@if [ ! -f $(EXECUTABLE) ]; then \

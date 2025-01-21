@@ -1,12 +1,14 @@
+import argon_pkg::*;
+
 module ArgonALU (
     // master I/O
     input i_Clk,
     input i_Reset,
-    input [15:0] i_bus,
-    output [15:0] o_bus,
+    input word_t i_bus,
+    output word_t o_bus,
     output o_bus_valid,
 
-    // control wires
+    // control wires (ALU)
     input i_latchA,
     input i_latchB,
     input i_latchF,
@@ -15,95 +17,67 @@ module ArgonALU (
     input i_outputF);
     
     // registers
-    logic [15:0] rA, rB, rY, rFlags;
-    logic [3:0] rOp;
-    logic [16:0] rTemporary;
-    logic [16:0] wResult;
+    word_t rA, rB, rY, rFlags;
+    logic [3:0] rALU;
+    logic [WORDSIZE:0] rTemporary;
+    logic [WORDSIZE:0] wResult;
 
     assign wResult = rTemporary;
-    
-    // operation constants
-    parameter OP_ADD        = 4'h0;
-    parameter OP_ADC        = 4'h1;
-    parameter OP_SBC        = 4'h2;
-    parameter OP_CMP        = 4'h3;
-    parameter OP_INC        = 4'h4;
-    parameter OP_DEC        = 4'h5;
-    parameter OP_NAND       = 4'h6;
-    parameter OP_AND        = 4'h7;
-    parameter OP_OR         = 4'h8;
-    parameter OP_NOR        = 4'h9;
-    parameter OP_XOR        = 4'hA;
-    parameter OP_LSH        = 4'hB;
-    parameter OP_RSH        = 4'hC;
-    parameter OP_RFU1        = 4'hD; // reserved for future use
-    parameter OP_RFU2        = 4'hE; // reserved for future use
-    parameter OP_RFU3        = 4'hF; // reserved for future use
 
-    // flag constants
-    parameter F_CARRY       = 0;
-    parameter F_ZERO        = 1;
-    parameter F_EQUAL       = 2;
-    parameter F_GREATER     = 3;
-    parameter F_LESS        = 4;
-    parameter F_BORROW      = 5;
-    parameter F_RFU1         = 6; // reserved for future use
-    parameter F_RFU2         = 7; // reserved for future use
-
-    // 17-bit zero-extended wires for operands
+    // 17-bit zero-extended wires for ALUerands
     logic [16:0] wA = {1'b0, rA};
     logic [16:0] wB = {1'b0, rB};
 
-    // Combinational block for ALU operations
+    // Combinational block for ALU ALUerations
     always_comb begin
-        case (rOp)
-            OP_ADD: begin
+        case (rALU)
+            ALU_ADD: begin
                 rTemporary = wA + wB;
             end
 
-            OP_ADC: begin
+            ALU_ADC: begin
                 rTemporary = wA + wB;
                 if (rFlags[F_CARRY]) rTemporary = rTemporary + 1;
             end
 
-            OP_SBC: begin
+            ALU_SBC: begin
                 rTemporary = wA - wB;
                 if (rFlags[F_CARRY]) rTemporary = rTemporary - 1;
             end
 
-            OP_INC: begin
+            ALU_INC: begin
                 rTemporary = wA + 1;
             end
 
-            OP_DEC: begin
+            ALU_DEC: begin
                 rTemporary = wA - 1;
             end
 
-            OP_NAND: begin
+            ALU_NAND: begin
                 rTemporary = {1'b0, ~(wA & wB)};
             end
 
-            OP_AND: begin
+            ALU_AND: begin
                 rTemporary = {1'b0, (wA & wB)};
             end
 
-            OP_OR: begin
+            ALU_OR: begin
                 rTemporary = {1'b0, (wA | wB)};
             end
 
-            OP_NOR: begin
+            ALU_NOR: begin
                 rTemporary = {1'b0, ~(wA | wB)};
             end
 
-            OP_XOR: begin
+            ALU_XOR: begin
                 rTemporary = {1'b0, (wA ^ wB)};
             end
 
-            OP_LSH: begin
+            ALU_LSH: begin
                 rTemporary = wA << wB[3:0];
             end
 
-            OP_RSH: begin
+            ALU_RSH: begin
                 rTemporary = wA >> wB[3:0];
             end
 
@@ -127,11 +101,11 @@ module ArgonALU (
             rA <= 0;
             rB <= 0;
             rFlags <= 0;
-            rOp <= 0;
+            rALU <= 0;
             rY <= 0;
         end
 
-        // handle sequential ALU operations
+        // handle sequential ALU ALUerations
         else begin
             // handle writing to the ALU
             if (i_latchA) begin
@@ -144,21 +118,21 @@ module ArgonALU (
                 rFlags <= i_bus[15:0];
             end
             else if (i_latchOp) begin
-                rOp <= i_bus[3:0];
+                rALU <= i_bus[3:0];
             end
 
             // update registers
             else begin
-                case (rOp)
-                    OP_ADD, OP_ADC, OP_SBC, OP_INC,
-                    OP_DEC, OP_NAND, OP_AND, OP_OR,
-                    OP_NOR, OP_XOR, OP_LSH, OP_RSH: begin
+                case (rALU)
+                    ALU_ADD, ALU_ADC, ALU_SBC, ALU_INC,
+                    ALU_DEC, ALU_NAND, ALU_AND, ALU_OR,
+                    ALU_NOR, ALU_XOR, ALU_LSH, ALU_RSH: begin
                         rY <= rTemporary[15:0];
                         rFlags[F_CARRY] <= w_carry;
                         rFlags[F_ZERO] <= w_zero;
                     end
 
-                    OP_CMP: begin
+                    ALU_CMP: begin
                         rFlags[F_ZERO] <= w_zero;
                         rFlags[F_EQUAL] <= w_equal;
                         rFlags[F_GREATER] <= w_greater;
@@ -166,7 +140,7 @@ module ArgonALU (
                     end
 
                     default: begin
-                        // Reserved opcodes do nothing
+                        // Reserved ALUcodes do nothing
                     end
                 endcase
             end
@@ -179,5 +153,5 @@ module ArgonALU (
                     i_outputF ? rFlags :
                     16'h0000;
 
-    assign o_bus_valid = i_outputY || i_outputF;
+    assign o_bus_valid = i_outputY | i_outputF;
 endmodule
