@@ -1,4 +1,4 @@
-# argon-cpu
+# Argon v1.5
 
 16-bit CPU implemented in SystemVerilog.
 
