@@ -7,7 +7,7 @@
 ## Units on the internal bus
  - [x] ALU
  - [x] Register File
- - [Control Unit]
+ - [ ] Control Unit
  - [ ] Memory Controller
  - [ ] Stack
  - [ ] Program Counter
