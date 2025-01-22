@@ -41,6 +41,9 @@ module SimTop (
     assign debug_bus.o_data = o_debug;
     assign debug_bus.o_valid = o_debug_valid;
 
+    // this is a test I really wanna test this
+    // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
     always_comb begin
         // define defaults (prevent latches)
         master_bus.o_data = 0;
