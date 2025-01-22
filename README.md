@@ -2,8 +2,14 @@
 
 16-bit CPU implemented in SystemVerilog.
 
-# Features
-- 16 registers (including zero, flags, control, and stack pointer)
-- 16 ALU operations (easily expandable)
-- 256x opcodes
-- Verilator testbench for cycle-accurate debugging/tests
+> This is a work in progress!
+
+## Units on the internal bus
+ - [x] ALU
+ - [x] Register File
+ - [Control Unit]
+ - [] Memory Controller
+ - [] Stack
+ - [] Program Counter
+ - [] Interrupt Handler
+ - [] Device Controller (communicates with devices on external bus)
