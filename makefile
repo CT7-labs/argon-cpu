@@ -59,5 +59,6 @@ run: $(EXECUTABLE)
 # Clean output files
 clean:
 	rm -rf $(OBJ_DIR)
+	rm -f *.vcd
 
 .PHONY: all clean run
