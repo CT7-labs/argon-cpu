@@ -13,5 +13,3 @@
  - [ ] Program Counter
  - [ ] Interrupt Handler
  - [ ] Device Controller (communicates with devices on external bus)
-
-TEST
