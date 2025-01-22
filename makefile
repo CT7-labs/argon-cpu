@@ -1,6 +1,3 @@
-# Default to no trace
-TRACE ?= 0
-
 # Directory structure
 HDL_DIR = hdl
 SRC_DIR = sim
@@ -12,7 +9,6 @@ PKG_FILES := $(wildcard $(PKG_DIR)/*.sv)
 VERILOG_FILES := $(wildcard $(HDL_DIR)/*.sv)
 
 # Debug prints
-$(info PKG_DIR = $(PKG_DIR))
 $(info PKG_FILES = $(PKG_FILES))
 $(info VERILOG_FILES = $(VERILOG_FILES))
 
@@ -27,13 +23,7 @@ EXECUTABLE = $(OBJ_DIR)/V$(TOP_MODULE)
 EXECUTABLE_FLAGS = --fromMake
 
 # Verilator flags
-VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal
-
-# Add trace flags if TRACE=1
-ifeq ($(TRACE), 1)
-    VERILATOR_FLAGS += --trace
-	EXECUTABLE_FLAGS += --traceOn
-endif
+VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal --trace
 
 # Make sure the obj directory exists
 $(shell mkdir -p $(OBJ_DIR))
@@ -65,10 +55,6 @@ run: $(EXECUTABLE)
 		exit 1; \
 	fi
 	$(EXECUTABLE) $(EXECUTABLE_FLAGS)
-
-# Pattern match for 'trace' in targets
-%trace:
-	$(MAKE) TRACE=1 $(subst trace,,$@)
 
 # Clean output files
 clean:

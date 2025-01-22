@@ -10,7 +10,6 @@ using namespace std;
 VSimTop* top = nullptr;
 VerilatedVcdC* tfp = nullptr;
 vluint64_t main_time = 0;
-bool traceOn = false;
 
 // Helper function to print results
 void printTest(const char* testName, bool passed) {
@@ -35,26 +34,16 @@ void simReset() {
 }
 
 void simClock(int i = 1) {
-    if (traceOn) {
-        for (int j = 0; j < i; j++) {
-            top->i_Clk = 0;
-            top->eval();
-            if (tfp) tfp->dump(main_time);
-            main_time++;
+    for (int j = 0; j < i; j++) {
+        top->i_Clk = 0;
+        top->eval();
+        if (tfp) tfp->dump(main_time);
+        main_time++;
 
-            top->i_Clk = 1;
-            top->eval();
-            if (tfp) tfp->dump(main_time);
-            main_time++;
-        }
-    } else {
-        for (int j = 0; j < i; j++) {
-            top->i_Clk = 1;
-            top->eval();
-
-            top->i_Clk = 0;
-            top->eval();
-        }
+        top->i_Clk = 1;
+        top->eval();
+        if (tfp) tfp->dump(main_time);
+        main_time++;
     }
 }
 
@@ -77,25 +66,16 @@ int main(int argc, char** argv) {
     } else {
         cout << "\n\nRunning Verilator simulation standalone\n";
     }
-
-    if (traceOn) {
-        cout << "Trace on\n\n";
-    } else {
-        cout << "Trace off\n\n";
-    }
-
     // Initialize Verilator
     Verilated::commandArgs(argc, argv);
     
     // Create instance of module
     top = new VSimTop;
 
-    if (traceOn) {
-        Verilated::traceEverOn(true);
-        tfp = new VerilatedVcdC;
-        top->trace(tfp, 99);  // Trace 99 levels of hierarchy
-        tfp->open("simtop.vcd");
-    }
+    Verilated::traceEverOn(true);
+    tfp = new VerilatedVcdC;
+    top->trace(tfp, 99);  // Trace 99 levels of hierarchy
+    tfp->open("simtop.vcd");
     // Reset
     simReset();
 
@@ -150,10 +130,8 @@ int main(int argc, char** argv) {
     cout << "Argon ALU's i_debug valid? " << bus_valid << "\n";
 
     // Cleanup
-    if (traceOn) {
-        tfp->close();
-        delete tfp;
-    }
+    tfp->close();
+    delete tfp;
     delete top;
     return 0;
 }
