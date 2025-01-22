@@ -1,5 +1,6 @@
 #include <iostream>
 #include <verilated.h>
+#include "verilated_vcd_c.h"
 #include <string.h>
 #include "VSimTop.h"
 
@@ -7,6 +8,9 @@ using namespace std;
 
 // Global pointer to the top module
 VSimTop* top = nullptr;
+VerilatedVcdC* tfp = nullptr;
+vluint64_t main_time = 0;
+bool traceOn = false;
 
 // Helper function to print results
 void printTest(const char* testName, bool passed) {
@@ -16,16 +20,41 @@ void printTest(const char* testName, bool passed) {
 void simReset() {
     top->i_Reset = 1;
     top->i_Clk = 0;
+
     top->eval();
     top->i_Reset = 0;
+    top->i_Clk = 1;
+
+    if (tfp) tfp->dump(main_time);
+    main_time++;
+
+    top->eval();
+
+    if (tfp) tfp->dump(main_time);
+    main_time++;
 }
 
 void simClock(int i = 1) {
-    for (int j = 0; j < i; j++) {
-        top->i_Clk = 1;
-        top->eval();
-        top->i_Clk = 0;
-        top->eval();
+    if (traceOn) {
+        for (int j = 0; j < i; j++) {
+            top->i_Clk = 0;
+            top->eval();
+            if (tfp) tfp->dump(main_time);
+            main_time++;
+
+            top->i_Clk = 1;
+            top->eval();
+            if (tfp) tfp->dump(main_time);
+            main_time++;
+        }
+    } else {
+        for (int j = 0; j < i; j++) {
+            top->i_Clk = 1;
+            top->eval();
+
+            top->i_Clk = 0;
+            top->eval();
+        }
     }
 }
 
@@ -37,13 +66,22 @@ int main(int argc, char** argv) {
         if (strcmp(argv[i], "--fromMake") == 0) {
             fromMakefile = true;
         }
+        else if (strcmp(argv[i], "--traceOn") == 0) {
+            traceOn = true;
+        }
     }
 
     // Different behavior based on how it was launched
     if (fromMakefile) {
-        cout << "\n\nRunning Verilator simulation from Makefile\n\n";
+        cout << "\n\nRunning Verilator simulation from Makefile\n";
     } else {
-        cout << "\n\nRunning Verilator simulation standalone\n\n";
+        cout << "\n\nRunning Verilator simulation standalone\n";
+    }
+
+    if (traceOn) {
+        cout << "Trace on\n\n";
+    } else {
+        cout << "Trace off\n\n";
     }
 
     // Initialize Verilator
@@ -51,45 +89,71 @@ int main(int argc, char** argv) {
     
     // Create instance of module
     top = new VSimTop;
-    
+
+    if (traceOn) {
+        Verilated::traceEverOn(true);
+        tfp = new VerilatedVcdC;
+        top->trace(tfp, 99);  // Trace 99 levels of hierarchy
+        tfp->open("simtop.vcd");
+    }
     // Reset
     simReset();
-    
+
+    top->read_id = 3; // debug
+    top->write_id = 1; // ALU
+
     // addition test! 15 + 22
     // latch 15 into ALU
     top->i_latchA = 1;
-    top->i_bus = 15;
+    top->o_debug = 15; // output from debug device onto bus
+    top->o_debug_valid = 1; // make sure the internal logic knows we're outputting valid data
     simClock();
     top->i_latchA = 0;
+    top->o_debug_valid = 0; // testing
+
+    cout << top->i_debug << "\n";
 
     // latch 22 into ALU
     top->i_latchB = 1;
-    top->i_bus = 22;
+    top->o_debug = 22;
+    top->o_debug_valid = 1;
     simClock();
     top->i_latchB = 0;
+    top->o_debug_valid = 0;
 
     // latch opcode into ALU
     top->i_latchOp = 1;
-    top->i_bus = 0;
+    top->o_debug = 0;
+    top->o_debug_valid = 1;
     simClock();
     top->i_latchOp = 0;
-    top->i_bus = 0; // not necessary, but good practice
+    top->o_debug_valid = 0;
+    top->o_debug = 0; // not necessary for this sim, but good practice
 
     // output result
+    top->read_id = 1; // debug is reading now
+    top->write_id = 3; // ALU is writing now
     top->i_outputY = 1;
     simClock(2);
-    top->i_outputY = 0;
+    top->i_outputY = 0; // not necessary for this sim, but good practice
 
     // store result
-    bool bus_valid = top->o_bus_valid;
-    uint16_t result = top->o_bus;
+    bool bus_valid = top->i_debug_valid; // read from bus
+    uint16_t result = top->i_debug;
+
+    // reset for testing purposes
+    simReset();
 
     // display result
     cout << "Attempted to add 15 + 22 = 37\n";
     cout << "Argon ALU got the result\n15 + 22 = " << result << "\n";
-    cout << "Argon ALU's o_bus valid? " << bus_valid << "\n";
+    cout << "Argon ALU's i_debug valid? " << bus_valid << "\n";
 
     // Cleanup
+    if (traceOn) {
+        tfp->close();
+        delete tfp;
+    }
     delete top;
     return 0;
 }

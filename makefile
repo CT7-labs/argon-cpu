@@ -24,6 +24,7 @@ CPP_SRC = $(SRC_DIR)/sim_main.cpp
 
 # Executable name
 EXECUTABLE = $(OBJ_DIR)/V$(TOP_MODULE)
+EXECUTABLE_FLAGS = --fromMake
 
 # Verilator flags
 VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal
@@ -31,7 +32,7 @@ VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal
 # Add trace flags if TRACE=1
 ifeq ($(TRACE), 1)
     VERILATOR_FLAGS += --trace
-    VERILATOR_FLAGS += -CFLAGS "-DTRACE"
+	EXECUTABLE_FLAGS += --traceOn
 endif
 
 # Make sure the obj directory exists
@@ -63,7 +64,7 @@ run: $(EXECUTABLE)
 		echo "Error: $(EXECUTABLE) not found or not executable"; \
 		exit 1; \
 	fi
-	$(EXECUTABLE) --fromMake
+	$(EXECUTABLE) $(EXECUTABLE_FLAGS)
 
 # Pattern match for 'trace' in targets
 %trace:

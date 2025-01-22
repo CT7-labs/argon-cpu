@@ -8,6 +8,13 @@ package argon_pkg;
     // types
     typedef logic [WORDSIZE-1: 0] word_t;
 
+    // bus unit IDs
+    parameter ID_ALU       = 4'h1;
+    parameter ID_REGFILE   = 4'h2;
+    parameter ID_DEBUG     = 4'h3;
+    parameter ID_RFU       = 4'h4; // reserved for future use
+    // and so on...
+
     // ALU operation constants
     parameter ALU_ADD        = 4'h0;
     parameter ALU_ADC        = 4'h1;
@@ -22,9 +29,8 @@ package argon_pkg;
     parameter ALU_XOR        = 4'hA;
     parameter ALU_LSH        = 4'hB;
     parameter ALU_RSH        = 4'hC;
-    parameter ALU_RFU1        = 4'hD; // reserved for future use
-    parameter ALU_RFU2        = 4'hE; // reserved for future use
-    parameter ALU_RFU3        = 4'hF; // reserved for future use
+    parameter ALU_RFU        = 4'hD; // reserved for future use
+    // and so on...
 
     // ALU flag constants
     parameter F_CARRY       = 0;
@@ -32,8 +38,8 @@ package argon_pkg;
     parameter F_EQUAL       = 2;
     parameter F_GREATER     = 3;
     parameter F_LESS        = 4;
-    parameter F_BORROW      = 5; // not 100% necessary
-    parameter F_RFU1         = 6; // reserved for future use
-    parameter F_RFU2         = 7; // reserved for future use
+    parameter F_BORROW      = 5; // not 100% necessary at the moment
+    parameter F_RFU         = 6; // reserved for future use
+    // and so on...
 
 endpackage
