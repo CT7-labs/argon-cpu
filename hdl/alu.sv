@@ -139,29 +139,6 @@ module ArgonALU (
                     rOp <= bus_if.i_data[3:0];
                 end 
             end
-
-            // update registers
-            else begin
-                case (rOp)
-                    ALU_ADD, ALU_ADC, ALU_SBC, ALU_INC,
-                    ALU_DEC, ALU_NAND, ALU_AND, ALU_OR,
-                    ALU_NOR, ALU_XOR, ALU_LSH, ALU_RSH: begin
-                        rFlags[F_CARRY] <= w_flags.carry;
-                        rFlags[F_ZERO] <= w_flags.zero;
-                    end
-
-                    ALU_CMP: begin
-                        rFlags[F_ZERO] <= w_flags.zero;
-                        rFlags[F_EQUAL] <= w_flags.equal;
-                        rFlags[F_GREATER] <= w_flags.greater;
-                        rFlags[F_LESS] <= w_flags.less;
-                    end
-
-                    default: begin
-                        // Reserved ALUcodes do nothing
-                    end
-                endcase
-            end
         end
 
     end
@@ -171,7 +148,7 @@ module ArgonALU (
         if (i_outputY)
             bus_if.o_data = wResult[15:0];
         else if (i_outputF)
-            bus_if.o_data = rFlags;
+            bus_if.o_data = w_flags;
         else
             bus_if.o_data = 16'h0000;
     end

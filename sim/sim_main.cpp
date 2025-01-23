@@ -40,6 +40,10 @@ void simClock(int i = 1) {
 void simReset(int i = 1) {
     top->i_Reset = 1;
 
+    if (main_time == 0) {
+        simClockFall();
+    }
+
     simClock(i);
 
     top->i_Reset = 0;
@@ -75,7 +79,6 @@ int main(int argc, char** argv) {
     
     // Reset
     simReset();
-    simClockFall();
 
     // "add" program begin
     top->read_id = 1; // ALU is reading from the bus
@@ -107,7 +110,7 @@ int main(int argc, char** argv) {
     top->write_id = 1; // ALU is writing to the bus
 
     top->write_command = 5; // ALU outputY
-    simClock(2);
+    simClock();
 
     uint16_t result = top->i_debug;
 

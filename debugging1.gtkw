@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Thu Jan 23 02:38:48 2025
+[*] Thu Jan 23 04:25:25 2025
 [*]
 [dumpfile] "/home/prestonz/ProjectSonder/verilog/argon/simtop.vcd"
-[dumpfile_mtime] "Thu Jan 23 02:35:46 2025"
-[dumpfile_size] 11423
+[dumpfile_mtime] "Thu Jan 23 04:22:11 2025"
+[dumpfile_size] 11371
 [savefile] "/home/prestonz/ProjectSonder/verilog/argon/debugging1.gtkw"
-[timestart] 0
+[timestart] 3
 [size] 2560 1467
 [pos] -1 -1
-*0.236562 3 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*0.236562 12 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.SimTop.
 [treeopen] TOP.SimTop.inst_ArgonALU.
@@ -80,10 +80,10 @@ TOP.SimTop.master_bus.write_id[3:0]
 @22
 [color] 3
 TOP.SimTop.alu_bus.command[3:0]
-@c00023
+@c00022
 [color] 6
 TOP.SimTop.alu_bus.i_data[15:0]
-@29
+@28
 [color] 6
 (0)TOP.SimTop.alu_bus.i_data[15:0]
 [color] 6
@@ -116,7 +116,7 @@ TOP.SimTop.alu_bus.i_data[15:0]
 (14)TOP.SimTop.alu_bus.i_data[15:0]
 [color] 6
 (15)TOP.SimTop.alu_bus.i_data[15:0]
-@1401201
+@1401200
 -group_end
 @28
 TOP.SimTop.alu_bus.i_valid
@@ -139,10 +139,16 @@ TOP.SimTop.inst_ArgonALU.i_outputY
 TOP.SimTop.inst_ArgonALU.rA[15:0]
 TOP.SimTop.inst_ArgonALU.rB[15:0]
 TOP.SimTop.inst_ArgonALU.rFlags[15:0]
-TOP.SimTop.inst_ArgonALU.rOp[3:0]
-TOP.SimTop.inst_ArgonALU.wA[16:0]
-TOP.SimTop.inst_ArgonALU.wB[16:0]
-TOP.SimTop.inst_ArgonALU.wResult[16:0]
+@800022
 TOP.SimTop.inst_ArgonALU.w_flags[5:0]
+@28
++{Carry Flag} (0)TOP.SimTop.inst_ArgonALU.w_flags[5:0]
++{Zero Flag} (1)TOP.SimTop.inst_ArgonALU.w_flags[5:0]
++{Equal Flag} (2)TOP.SimTop.inst_ArgonALU.w_flags[5:0]
++{Greater Flag} (3)TOP.SimTop.inst_ArgonALU.w_flags[5:0]
++{Less Flag} (4)TOP.SimTop.inst_ArgonALU.w_flags[5:0]
++{Borrow Flag} (5)TOP.SimTop.inst_ArgonALU.w_flags[5:0]
+@1001200
+-group_end
 [pattern_trace] 1
 [pattern_trace] 0
