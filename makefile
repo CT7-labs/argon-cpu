@@ -3,9 +3,11 @@ HDL_DIR = hdl
 SRC_DIR = sim
 OBJ_DIR = obj_dir
 PKG_DIR = hdl/pkg
+COMMON_DIR = hdl/common
 
 # Find SystemVerilog files
 PKG_FILES := $(wildcard $(PKG_DIR)/*.sv)
+COMMON_FILES := $(wildcard $(COMMON_DIR)/*.sv)
 VERILOG_FILES := $(wildcard $(HDL_DIR)/*.sv)
 
 # Debug prints
@@ -23,7 +25,7 @@ EXECUTABLE = $(OBJ_DIR)/V$(TOP_MODULE)
 EXECUTABLE_FLAGS = --fromMake
 
 # Verilator flags
-VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal --trace
+VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal --trace -I$(HDL_DIR)
 
 # Make sure the obj directory exists
 $(shell mkdir -p $(OBJ_DIR))
@@ -34,13 +36,14 @@ $(shell mkdir -p $(SRC_DIR))
 all: $(EXECUTABLE)
 
 # Verilate and build
-$(EXECUTABLE): $(PKG_FILES) $(VERILOG_FILES) $(CPP_SRC)
+$(EXECUTABLE): $(PKG_FILES) $(COMMON_FILES) $(VERILOG_FILES) $(CPP_SRC)
 	@echo "Building $(EXECUTABLE)..."
 	verilator $(VERILATOR_FLAGS) \
 		-CFLAGS "-std=c++11" \
 		--top-module $(TOP_MODULE) \
 		--Mdir $(OBJ_DIR) \
 		$(PKG_FILES) \
+		$(COMMON_FILES) \
 		$(VERILOG_FILES) \
 		$(CPP_SRC)
 	@if [ ! -f $(EXECUTABLE) ]; then \
