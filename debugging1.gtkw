@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Thu Jan 23 02:25:19 2025
+[*] Thu Jan 23 02:38:48 2025
 [*]
 [dumpfile] "/home/prestonz/ProjectSonder/verilog/argon/simtop.vcd"
-[dumpfile_mtime] "Thu Jan 23 01:54:18 2025"
-[dumpfile_size] 11238
+[dumpfile_mtime] "Thu Jan 23 02:35:46 2025"
+[dumpfile_size] 11423
 [savefile] "/home/prestonz/ProjectSonder/verilog/argon/debugging1.gtkw"
 [timestart] 0
 [size] 2560 1467
@@ -83,7 +83,7 @@ TOP.SimTop.alu_bus.command[3:0]
 @c00023
 [color] 6
 TOP.SimTop.alu_bus.i_data[15:0]
-@28
+@29
 [color] 6
 (0)TOP.SimTop.alu_bus.i_data[15:0]
 [color] 6

@@ -45,16 +45,18 @@ module SimTop (
                 if (alu_bus.o_valid) begin
                     master_bus.o_data = alu_bus.o_data;
                     master_bus.o_valid = alu_bus.o_valid;
-                    alu_bus.command = write_command;
-                end 
+                end
+
+                alu_bus.command = write_command;
             end
 
             ID_REGFILE: begin
                 if (regfile_bus.o_valid) begin
                     master_bus.o_data = regfile_bus.o_data;
                     master_bus.o_valid = regfile_bus.o_valid;
-                    regfile_bus.command = write_command;
                 end
+
+                regfile_bus.command = write_command;
             end
 
             ID_DEBUG: begin
@@ -62,6 +64,11 @@ module SimTop (
                     master_bus.o_data = debug_bus.o_data;
                     master_bus.o_valid = debug_bus.o_valid;
                 end
+            end
+
+            default: begin
+                alu_bus.command = 0;
+                regfile_bus.command = 0;
             end
         endcase
 
@@ -87,6 +94,9 @@ module SimTop (
             default: begin
                 master_bus.i_data = master_bus.o_data;
                 master_bus.i_valid = 0;
+
+                alu_bus.command = 0;
+                regfile_bus.command = 0;
             end
         endcase
     end
