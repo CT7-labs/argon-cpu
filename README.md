@@ -14,7 +14,7 @@ This is a work in progress!
  - [ ] Interrupt Handler
  - [ ] Device Controller (communicates with devices on external bus)
 
-## Future Plans
+## Near-future Plans
 - [ ] Verilator emulator (not super fast, but cycle-accurate!)
 - [ ] Emulator (written in C++ for speed)
 - [ ] Assembler (written in C++, Python, or both!)
