@@ -5,33 +5,23 @@ module SimTop (
     input i_Reset,
 
     // for testing simulating with verilator
-    output word_t i_debug,
-    output i_debug_valid,
+    output word_t i_debug, // inputs data to the verilator simulation
+    output i_debug_valid, // inputs "data valid" signal to the verilator simulation
     input word_t o_debug,
     input o_debug_valid,
 
     // control unit will take over these ports
     input [3:0] write_id,
     input [3:0] read_id,
-
-    // control wires (ALU)
-    input i_latchA,
-    input i_latchB,
-    input i_latchF,
-    input i_latchOp,
-    input i_outputY,
-    input i_outputF,
-
-    // control wires (RegFile)
-    input i_selectLatch,
-    input i_outputA,
-    input i_outputB,
-    input i_latchC);
+    input [3:0] write_command,
+    input [3:0] read_command);
 
     // bus interfaces
     master_bus_if master_bus();
     assign master_bus.read_id = read_id;
     assign master_bus.write_id = write_id;
+    assign master_bus.read_command = read_command;
+    assign master_bus.write_command = write_command;
 
     bus_if alu_bus();
     bus_if regfile_bus();
@@ -49,12 +39,13 @@ module SimTop (
         master_bus.o_data = 0;
         master_bus.o_valid = 0;
 
-        // handle reading from units on the bus
-        case (read_id)
+        // handle units writing to the bus
+        case (write_id)
             ID_ALU: begin
                 if (alu_bus.o_valid) begin
                     master_bus.o_data = alu_bus.o_data;
                     master_bus.o_valid = alu_bus.o_valid;
+                    alu_bus.command = write_command;
                 end 
             end
 
@@ -62,6 +53,7 @@ module SimTop (
                 if (regfile_bus.o_valid) begin
                     master_bus.o_data = regfile_bus.o_data;
                     master_bus.o_valid = regfile_bus.o_valid;
+                    regfile_bus.command = write_command;
                 end
             end
 
@@ -73,16 +65,18 @@ module SimTop (
             end
         endcase
 
-        // handle writing to units on the bus
-        case (write_id)
+        // handle units reading from the bus
+        case (read_id)
             ID_ALU: begin
                 alu_bus.i_data = master_bus.o_data;
                 alu_bus.i_valid = master_bus.o_valid;
+                alu_bus.command = master_bus.read_command;
             end
 
             ID_REGFILE: begin
                 regfile_bus.i_data = master_bus.o_data;
                 regfile_bus.i_valid = master_bus.o_valid;
+                regfile_bus.command = master_bus.read_command;
             end
 
             ID_DEBUG: begin
@@ -103,20 +97,10 @@ module SimTop (
     ArgonALU inst_ArgonALU (
         .i_Clk(i_Clk),
         .i_Reset(i_Reset),
-        .bus_if(alu_bus),
-        .i_latchA(i_latchA),
-        .i_latchB(i_latchB),
-        .i_latchF(i_latchF),
-        .i_latchOp(i_latchOp),
-        .i_outputY(i_outputY),
-        .i_outputF(i_outputF));
+        .bus_if(alu_bus));
 
     ArgonRegFile inst_ArgonRegFile (
         .i_Clk(i_Clk),
         .i_Reset(i_Reset),
-        .bus_if(regfile_bus),
-        .i_selectLatch(i_selectLatch),
-        .i_outputA(i_outputA),
-        .i_outputB(i_outputB),
-        .i_latchC(i_latchC));
+        .bus_if(regfile_bus));
 endmodule

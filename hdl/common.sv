@@ -9,7 +9,7 @@ interface master_bus_if;
     logic [3:0] write_id;
     logic [3:0] read_id;
     logic [3:0] write_command;
-    logic [3:0] read_command
+    logic [3:0] read_command;
 endinterface
 
 interface bus_if;
@@ -19,21 +19,3 @@ interface bus_if;
     logic o_valid;
     logic [3:0] command;
 endinterface
-
-module BusBuffer #(
-    parameter UNIT_ID = 4'h1
-)(
-    master_bus_if mbus,
-    bus_if ubus);
-
-    always_comb begin
-
-        if (mbus.write_id == UNIT_ID)
-            ubus.i_data = mbus.o_data;
-        
-        if (mbus.read_id == UNIT_ID) begin
-            mbus.o_data = ubus.o_data;
-        end
-    end
-
-endmodule

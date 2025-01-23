@@ -16,35 +16,33 @@ void printTest(const char* testName, bool passed) {
     cout << testName << ": " << (passed ? "PASSED" : "FAILED") << std::endl;
 }
 
-void simReset() {
-    top->i_Reset = 1;
+void simClockFall() {
     top->i_Clk = 0;
-
     top->eval();
-    top->i_Reset = 0;
-    top->i_Clk = 1;
-
-    if (tfp) tfp->dump(main_time);
+    tfp->dump(main_time);
     main_time++;
+}
 
+void simClockRise() {
+    top->i_Clk = 1;
     top->eval();
-
-    if (tfp) tfp->dump(main_time);
+    tfp->dump(main_time);
     main_time++;
 }
 
 void simClock(int i = 1) {
     for (int j = 0; j < i; j++) {
-        top->i_Clk = 0;
-        top->eval();
-        if (tfp) tfp->dump(main_time);
-        main_time++;
-
-        top->i_Clk = 1;
-        top->eval();
-        if (tfp) tfp->dump(main_time);
-        main_time++;
+        simClockRise();
+        simClockFall();
     }
+}
+
+void simReset(int i = 1) {
+    top->i_Reset = 1;
+
+    simClock(i);
+
+    top->i_Reset = 0;
 }
 
 int main(int argc, char** argv) {
@@ -54,9 +52,6 @@ int main(int argc, char** argv) {
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--fromMake") == 0) {
             fromMakefile = true;
-        }
-        else if (strcmp(argv[i], "--traceOn") == 0) {
-            traceOn = true;
         }
     }
 
@@ -76,58 +71,50 @@ int main(int argc, char** argv) {
     tfp = new VerilatedVcdC;
     top->trace(tfp, 99);  // Trace 99 levels of hierarchy
     tfp->open("simtop.vcd");
+    
+    
     // Reset
     simReset();
+    simClockFall();
 
-    top->read_id = 3; // debug
-    top->write_id = 1; // ALU
+    // "add" program begin
+    top->read_id = 1; // ALU is reading from the bus
+    top->write_id = 3; // debug is writing to the bus
+    top->o_debug_valid = 1; // debug output is valid
 
-    // addition test! 15 + 22
-    // latch 15 into ALU
-    top->i_latchA = 1;
-    top->o_debug = 15; // output from debug device onto bus
-    top->o_debug_valid = 1; // make sure the internal logic knows we're outputting valid data
+    top->read_command = 1; // ALU latchA
+    top->o_debug = 15; // debug is outputing 15 on the bus
     simClock();
-    top->i_latchA = 0;
-    top->o_debug_valid = 0; // testing
 
-    cout << top->i_debug << "\n";
 
-    // latch 22 into ALU
-    top->i_latchB = 1;
-    top->o_debug = 22;
-    top->o_debug_valid = 1;
+
+    top->read_command = 2; // ALU latchB
+    top->o_debug = 22; // debug is outputing 22 on the bus
     simClock();
-    top->i_latchB = 0;
-    top->o_debug_valid = 0;
 
-    // latch opcode into ALU
-    top->i_latchOp = 1;
+
+
+    top->read_command = 4; // ALU latchOp
+    top->o_debug = 0; // debug is outputing 0 (ADD opcode) on the bus
+    simClock();
+
+
+    top->o_debug_valid = 0; // debug output is no longer valid
+    top->read_command = 0;
     top->o_debug = 0;
-    top->o_debug_valid = 1;
-    simClock();
-    top->i_latchOp = 0;
-    top->o_debug_valid = 0;
-    top->o_debug = 0; // not necessary for this sim, but good practice
+    
+    top->read_id = 3; // debug is reading from the bus
+    top->write_id = 1; // ALU is writing to the bus
 
-    // output result
-    top->read_id = 1; // debug is reading now
-    top->write_id = 3; // ALU is writing now
-    top->i_outputY = 1;
+    top->write_command = 5; // ALU outputY
     simClock(2);
-    top->i_outputY = 0; // not necessary for this sim, but good practice
 
-    // store result
-    bool bus_valid = top->i_debug_valid; // read from bus
     uint16_t result = top->i_debug;
 
-    // reset for testing purposes
     simReset();
 
-    // display result
-    cout << "Attempted to add 15 + 22 = 37\n";
-    cout << "Argon ALU got the result\n15 + 22 = " << result << "\n";
-    cout << "Argon ALU's i_debug valid? " << bus_valid << "\n";
+
+    cout << result << "\n";
 
     // Cleanup
     tfp->close();

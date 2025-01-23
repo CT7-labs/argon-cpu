@@ -1,27 +1,34 @@
 import argon_pkg::*;
+import alu_pkg::*;
 
 module ArgonALU (
-    // master I/O
+    // Interface signals
     input i_Clk,
     input i_Reset,
-    bus_if bus_if,
-
-    // control wires (ALU)
-    input i_latchA,
-    input i_latchB,
-    input i_latchF,
-    input i_latchOp,
-    input i_outputY,
-    input i_outputF);
+    bus_if bus_if);
     
     // registers
-    word_t rA, rB, rY, rFlags;
-    logic [3:0] rOp;
-    logic [WORDSIZE:0] wResult;
+    word_t rA, rB;     // data registers
+    word_t rFlags;          // Flags register
+    logic [3:0] rOp;        // ALU opcode
 
-    // 17-bit zero-extended wires for ALUerands
-    logic [16:0] wA = {1'b0, rA};
-    logic [16:0] wB = {1'b0, rB};
+    // Computational wires
+    logic [WORDSIZE:0] wA = {1'b0, rA}; // 17-bit zero-extended A
+    logic [WORDSIZE:0] wB = {1'b0, rB}; // 17-bit zero-extended B
+    logic [WORDSIZE:0] wResult;         // 17-bit extended result
+
+    // decoding internal control signals from command input
+
+    logic i_latchA, i_latchB, i_latchF, i_latchOp, i_outputY, i_outputF;
+    
+    always_comb begin
+        i_latchA = (bus_if.command == com_latchA) ? 1'b1 : 1'b0;
+        i_latchB = (bus_if.command == com_latchB) ? 1'b1 : 1'b0;
+        i_latchF = (bus_if.command == com_latchF) ? 1'b1 : 1'b0;
+        i_latchOp = (bus_if.command == com_latchOp) ? 1'b1 : 1'b0;
+        i_outputY = (bus_if.command == com_outputY) ? 1'b1 : 1'b0;
+        i_outputF = (bus_if.command == com_outputF) ? 1'b1 : 1'b0; 
+    end
 
     // Combinational block for ALU ALUerations
     always_comb begin
@@ -85,12 +92,23 @@ module ArgonALU (
     end
 
     // combinatational block for flags
-    logic w_carry = wResult[16];
-    logic w_zero = (wResult[15:0] == 0);
-    logic w_equal = (rA == rB);
-    logic w_greater = (rA > rB);
-    logic w_less = (rA < rB);
-    logic w_borrow = (wResult[16]);
+    struct packed {
+        logic carry;
+        logic zero;
+        logic equal;
+        logic greater;
+        logic less;
+        logic borrow;
+    } w_flags;
+
+    assign w_flags = '{
+        carry:     wResult[16],
+        zero:      (wResult[15:0] == 0),
+        equal:     (rA == rB),
+        greater:   (rA > rB),
+        less:      (rA < rB),
+        borrow:    (wResult[16])
+    };
 
     always_ff @(posedge i_Clk or posedge i_Reset) begin
         // handle reset
@@ -99,7 +117,6 @@ module ArgonALU (
             rB <= 0;
             rFlags <= 0;
             rOp <= 0;
-            rY <= 0;
         end
 
         // handle sequential ALU ALUerations
@@ -129,16 +146,15 @@ module ArgonALU (
                     ALU_ADD, ALU_ADC, ALU_SBC, ALU_INC,
                     ALU_DEC, ALU_NAND, ALU_AND, ALU_OR,
                     ALU_NOR, ALU_XOR, ALU_LSH, ALU_RSH: begin
-                        rY <= wResult[15:0];
-                        rFlags[F_CARRY] <= w_carry;
-                        rFlags[F_ZERO] <= w_zero;
+                        rFlags[F_CARRY] <= w_flags.carry;
+                        rFlags[F_ZERO] <= w_flags.zero;
                     end
 
                     ALU_CMP: begin
-                        rFlags[F_ZERO] <= w_zero;
-                        rFlags[F_EQUAL] <= w_equal;
-                        rFlags[F_GREATER] <= w_greater;
-                        rFlags[F_LESS] <= w_less;
+                        rFlags[F_ZERO] <= w_flags.zero;
+                        rFlags[F_EQUAL] <= w_flags.equal;
+                        rFlags[F_GREATER] <= w_flags.greater;
+                        rFlags[F_LESS] <= w_flags.less;
                     end
 
                     default: begin
@@ -163,7 +179,7 @@ module ArgonALU (
     /*
     the above always_comb block could be implemented with this assign statement:
 
-    assign bus_if.o_data = i_outputY ? rY :
+    assign bus_if.o_data = i_outputY ? wResult :
                             i_outputF ? rFlags :
                             16'h0000;
     */
