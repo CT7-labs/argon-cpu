@@ -1,7 +1,7 @@
 # TODO
 
-- Lay out ALU requirements in alu.sv
-- Redo ALU
+- ~~Lay out ALU requirements in alu.sv~~
+- ~~Redo ALU~~
 - Lay out register file requirements in regfile.sv
 - Redo register file
 - write register file test
