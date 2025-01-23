@@ -16,41 +16,36 @@ namespace UID {
 }
 
 namespace ALU {
-    namespace OP {
-        const int ADD   = 0x0;
-        const int ADC   = 0x1;
-        const int SBC   = 0x2;
-        const int CMP   = 0x3;
-        const int INC   = 0x4;
-        const int DEC   = 0x5;
-        const int NAND  = 0x6;
-        const int AND   = 0x7;
-        const int OR    = 0x8;
-        const int NOR   = 0x9;
-        const int XOR   = 0xA;
-        const int LSH   = 0xB;
-        const int RSH   = 0xC;
-    }
+    const int OP_ADD   = 0x0;
+    const int OP_ADC   = 0x1;
+    const int OP_SBC   = 0x2;
+    const int OP_CMP   = 0x3;
+    const int OP_INC   = 0x4;
+    const int OP_DEC   = 0x5;
+    const int OP_NAND  = 0x6;
+    const int OP_AND   = 0x7;
+    const int OP_OR    = 0x8;
+    const int OP_NOR   = 0x9;
+    const int OP_XOR   = 0xA;
+    const int OP_LSH   = 0xB;
+    const int OP_RSH   = 0xC;
 
-    namespace COM {
-        const int LATCHA    = 1;
-        const int LATCHB    = 2;
-        const int LATCHF    = 3;
-        const int LATCHOP   = 4;
-        const int OUTPUTY   = 5;
-        const int OUTPUTF   = 6;
-        const int COMPUTE   = 7;
-    }
+    const int COM_LATCHA    = 1;
+    const int COM_LATCHB    = 2;
+    const int COM_LATCHF    = 3;
+    const int COM_LATCHOP   = 4;
+    const int COM_OUTPUTY   = 5;
+    const int COM_OUTPUTF   = 6;
+    const int COM_COMPUTE   = 7;
 
-    namespace FLAG {
-        const int CARRY     = 1 << 0;
-        const int ZERO      = 1 << 1;
-        const int EQUAL     = 1 << 2;
-        const int GREATER   = 1 << 3;
-        const int LESS      = 1 << 4;
-        const int BORROW    = 1 << 5;
-        const int ERROR     = 1 << 15;
-    }
+    // flag constants
+    const int F_CARRY     = 1 << 0;
+    const int F_ZERO      = 1 << 1;
+    const int F_EQUAL     = 1 << 2;
+    const int F_GREATER   = 1 << 3;
+    const int F_LESS      = 1 << 4;
+    const int F_BORROW    = 1 << 5;
+    const int F_ERROR     = 1 << 15;
 }
 
 #endif

@@ -1,9 +1,10 @@
-#include "../test_functions.h"
+#include "../sim_header.h"
 
 using namespace std;
-using namespace ALU;
 
 void add37(VSimTop* top, VerilatedFstC* tfp) {
+    cout << "=== Running \"add37\" simulation ===\ntesting ALU functionality\n\n";
+
     // Reset
     simReset();
 
@@ -18,21 +19,19 @@ void add37(VSimTop* top, VerilatedFstC* tfp) {
 
 
 
-    top->read_command = COM::LATCHB; // ALU latchB
+    top->read_command = ALU::COM_LATCHB; // ALU latchB
     top->o_debug = 21; // debug is outputing 22 on the bus
     simClock();
 
-    top->read_command = COM::LATCHF; // ALU latchF
-    top->o_debug = FLAG::CARRY; // debug is outputing 22 on the bus
+    top->read_command = ALU::COM_LATCHF; // ALU latchF
+    top->o_debug = ALU::F_CARRY; // debug is outputing 22 on the bus
     simClock();
 
-
-
-    top->read_command = COM::LATCHOP; // ALU latchOp
+    top->read_command = ALU::COM_LATCHOP; // ALU latchOp
     top->o_debug = 1; // debug is outputing 0 (ADD opcode) on the bus
     simClock();
 
-    top->read_command = COM::COMPUTE; // ALU compute
+    top->read_command = ALU::COM_COMPUTE; // ALU compute
     top->o_debug = 0; // output isn't really necessary so setting it to zero
     top->o_debug_valid = 0; // debug output is no longer valid
     simClock();
@@ -43,7 +42,7 @@ void add37(VSimTop* top, VerilatedFstC* tfp) {
     top->read_id = 3; // debug is reading from the bus
     top->write_id = 1; // ALU is writing to the bus
 
-    top->write_command = COM::OUTPUTY; // ALU outputY
+    top->write_command = ALU::COM_OUTPUTY; // ALU outputY
     simClock();
 
     uint16_t result = top->i_debug;

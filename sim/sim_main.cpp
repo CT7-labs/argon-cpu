@@ -3,7 +3,7 @@
 #include "VSimTop.h"
 #include <iostream>
 #include <string.h>
-#include "test_functions.h"
+#include "sim_header.h"
 
 using namespace std;
 
@@ -61,9 +61,9 @@ int main(int argc, char** argv) {
 
     // Different behavior based on how it was launched
     if (fromMakefile) {
-        cout << "\n\nRunning Verilator simulation from Makefile\n";
+        cout << "\n\nRunning Verilator simulation from Makefile\n\n";
     } else {
-        cout << "\n\nRunning Verilator simulation standalone\n";
+        cout << "\n\nRunning Verilator simulation standalone\n\n";
     }
     // Initialize Verilator
     Verilated::commandArgs(argc, argv);
