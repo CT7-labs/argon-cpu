@@ -1,6 +1,7 @@
 #include "../test_functions.h"
 
 using namespace std;
+using namespace ALU;
 
 void add37(VSimTop* top, VerilatedFstC* tfp) {
     // Reset
@@ -17,25 +18,32 @@ void add37(VSimTop* top, VerilatedFstC* tfp) {
 
 
 
-    top->read_command = 2; // ALU latchB
-    top->o_debug = 22; // debug is outputing 22 on the bus
+    top->read_command = COM::LATCHB; // ALU latchB
+    top->o_debug = 21; // debug is outputing 22 on the bus
+    simClock();
+
+    top->read_command = COM::LATCHF; // ALU latchF
+    top->o_debug = FLAG::CARRY; // debug is outputing 22 on the bus
     simClock();
 
 
 
-    top->read_command = 4; // ALU latchOp
-    top->o_debug = 0; // debug is outputing 0 (ADD opcode) on the bus
+    top->read_command = COM::LATCHOP; // ALU latchOp
+    top->o_debug = 1; // debug is outputing 0 (ADD opcode) on the bus
     simClock();
 
-
+    top->read_command = COM::COMPUTE; // ALU compute
+    top->o_debug = 0; // output isn't really necessary so setting it to zero
     top->o_debug_valid = 0; // debug output is no longer valid
-    top->read_command = 0;
-    top->o_debug = 0;
-    
+    simClock();
+
+
+    top->read_command = 0; // setting debug read_command to 0
+    top->o_debug = 0; // not outputting anything from debug
     top->read_id = 3; // debug is reading from the bus
     top->write_id = 1; // ALU is writing to the bus
 
-    top->write_command = 5; // ALU outputY
+    top->write_command = COM::OUTPUTY; // ALU outputY
     simClock();
 
     uint16_t result = top->i_debug;

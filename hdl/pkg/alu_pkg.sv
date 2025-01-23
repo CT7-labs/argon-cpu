@@ -1,15 +1,15 @@
 package alu_pkg;
     // ALU input command constants
     // 0 is not used for the sake of having a "NOP" signal
-    parameter com_latchA    = 4'h1;
-    parameter com_latchB    = 4'h2;
-    parameter com_latchF    = 4'h3;
-    parameter com_latchOp   = 4'h4;
-    parameter com_outputY   = 4'h5;
-    parameter com_outputF   = 4'h6;
-    parameter com_rfu       = 4'h7; // reserved for future use
+    parameter COM_LATCHA    = 4'h1;
+    parameter COM_LATCHB    = 4'h2;
+    parameter COM_LATCHF    = 4'h3;
+    parameter COM_LATCHOP   = 4'h4;
+    parameter COM_OUTPUTY   = 4'h5;
+    parameter COM_OUTPUTF   = 4'h6;
+    parameter COM_COMPUTE   = 4'h7;
 
-    // ALU operation constants
+    // ALU operation constants (4-bit opcode for now)
     parameter ALU_ADD        = 4'h0;
     parameter ALU_ADC        = 4'h1;
     parameter ALU_SBC        = 4'h2;
@@ -23,8 +23,6 @@ package alu_pkg;
     parameter ALU_XOR        = 4'hA;
     parameter ALU_LSH        = 4'hB;
     parameter ALU_RSH        = 4'hC;
-    parameter ALU_RFU        = 4'hD; // reserved for future use
-    // and so on...
 
     // ALU flag constants
     parameter F_CARRY       = 0;
@@ -32,6 +30,5 @@ package alu_pkg;
     parameter F_EQUAL       = 2;
     parameter F_GREATER     = 3;
     parameter F_LESS        = 4;
-    parameter F_BORROW      = 5; // not 100% necessary at the moment
-    parameter F_RFU         = 6; // reserved for future use
+    parameter F_ERROR       = 15;
 endpackage

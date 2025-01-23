@@ -79,8 +79,6 @@ int main(int argc, char** argv) {
     // run test
     add37(top, tfp);
 
-    cout << "\""<< ALU::OP::LSH << "\"\n";
-
     // Cleanup
     tfp->close();
     delete tfp;

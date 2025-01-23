@@ -1,3 +1,28 @@
+/*
+
++---------------+
+|   Argon ALU   |
++---------------+
+
+- 16 opcodes
+- 16-bit arithmetic
+- 16-bit flags register
+- Single bus operation
+
++-----------+
+|   Usage   |
++-----------+
+
+1. Load rA
+2. Load rB
+3. Load rOp
+4. Load rF (depending on operation)
+5. Latch internal result into rY and rF
+6. Output result
+7. Output flags
+
+*/
+
 import constants_pkg::*;
 import alu_pkg::*;
 
@@ -8,159 +33,98 @@ module ArgonALU (
     bus_if bus_if);
     
     // registers
-    word_t rA, rB;     // data registers
-    word_t rFlags;          // Flags register
-    logic [3:0] rOp;        // ALU opcode
+    word_t rA, rB, rF, rY;
+    logic [3:0] rOp;
 
-    // Computational wires
-    logic [WORDSIZE:0] wA = {1'b0, rA}; // 17-bit zero-extended A
-    logic [WORDSIZE:0] wB = {1'b0, rB}; // 17-bit zero-extended B
-    logic [WORDSIZE:0] wResult;         // 17-bit extended result
 
-    // decoding internal control signals from command input
+    // handle clocked logic
+    always_ff @(posedge i_Clk or posedge i_Reset) begin
 
-    logic i_latchA, i_latchB, i_latchF, i_latchOp, i_outputY, i_outputF;
-    
-    always_comb begin
-        i_latchA = (bus_if.command == com_latchA) ? 1'b1 : 1'b0;
-        i_latchB = (bus_if.command == com_latchB) ? 1'b1 : 1'b0;
-        i_latchF = (bus_if.command == com_latchF) ? 1'b1 : 1'b0;
-        i_latchOp = (bus_if.command == com_latchOp) ? 1'b1 : 1'b0;
-        i_outputY = (bus_if.command == com_outputY) ? 1'b1 : 1'b0;
-        i_outputF = (bus_if.command == com_outputF) ? 1'b1 : 1'b0; 
+        // reset logic
+        if (i_Reset) begin
+            rA <= '0;
+            rB <= '0;
+            rF <= '0;
+            rY <= '0;
+            rOp <= '0;
+        end
+
+        // command interpretation
+        if (bus_if.command == COM_COMPUTE) begin
+            rY <= extended_result[WORDSIZE-1:0];
+            rF <= result_flags;
+        end
+
+        else if (bus_if.i_valid) begin
+            case (bus_if.command)
+                COM_LATCHA:
+                    rA <= bus_if.i_data;
+                
+                COM_LATCHB:
+                    rB <= bus_if.i_data;
+                
+                COM_LATCHF:
+                    rF <= bus_if.i_data;
+                
+                COM_LATCHOP:
+                    rOp <= bus_if.i_data[3:0];
+                
+                default: begin
+                    // do nothing; don't write to internal registers
+                end
+            endcase
+        end
     end
 
-    // Combinational block for ALU ALUerations
     always_comb begin
-        case (rOp)
-            ALU_ADD: begin
-                wResult = wA + wB;
+        case (bus_if.command)
+            COM_OUTPUTY: begin
+                bus_if.o_data = rY; 
+                bus_if.o_valid = 1;
             end
 
-            ALU_ADC: begin
-                wResult = wA + wB;
-                if (rFlags[F_CARRY])
-                    wResult = wResult + 1;
-            end
-
-            ALU_SBC: begin
-                wResult = wA - wB;
-                if (rFlags[F_CARRY])
-                    wResult = wResult - 1;
-            end
-
-            ALU_INC: begin
-                wResult = wA + 1;
-            end
-
-            ALU_DEC: begin
-                wResult = wA - 1;
-            end
-
-            ALU_NAND: begin
-                wResult = {1'b0, ~(wA & wB)};
-            end
-
-            ALU_AND: begin
-                wResult = {1'b0, (wA & wB)};
-            end
-
-            ALU_OR: begin
-                wResult = {1'b0, (wA | wB)};
-            end
-
-            ALU_NOR: begin
-                wResult = {1'b0, ~(wA | wB)};
-            end
-
-            ALU_XOR: begin
-                wResult = {1'b0, (wA ^ wB)};
-            end
-
-            ALU_LSH: begin
-                wResult = wA << wB[3:0];
-            end
-
-            ALU_RSH: begin
-                wResult = wA >> wB[3:0];
+            COM_OUTPUTF: begin
+                bus_if.o_data = rF;
+                bus_if.o_valid = 1;
             end
 
             default: begin
-                wResult = 0; // defualt case returns 0
+                bus_if.o_data = '0;
+                bus_if.o_valid = 0;
             end
         endcase
     end
 
-    // combinatational block for flags
-    struct packed {
-        logic carry;
-        logic zero;
-        logic equal;
-        logic greater;
-        logic less;
-        logic borrow;
-    } w_flags;
+    // compute
+    logic [WORDSIZE:0] extended_rA = {1'b0, rA};
+    logic [WORDSIZE:0] extended_rB = {1'b0, rB};
+    logic [WORDSIZE:0] extended_result;
+    word_t result_flags;
 
-    assign w_flags = '{
-        carry:     wResult[16],
-        zero:      (wResult[15:0] == 0),
-        equal:     (rA == rB),
-        greater:   (rA > rB),
-        less:      (rA < rB),
-        borrow:    (wResult[16])
-    };
-
-    always_ff @(posedge i_Clk or posedge i_Reset) begin
-        // handle reset
-        if (i_Reset) begin
-            rA <= 0;
-            rB <= 0;
-            rFlags <= 0;
-            rOp <= 0;
-        end
-
-        // handle sequential ALU ALUerations
-        else begin
-            // handle writing to the ALU
-            if (bus_if.i_valid) begin
-                if (i_latchA) begin
-                    rA <= bus_if.i_data;
-                end
-
-                else if (i_latchB) begin
-                    rB <= bus_if.i_data;
-                end
-
-                else if (i_latchF) begin
-                    rFlags <= bus_if.i_data;
-                end
-
-                else if (i_latchOp) begin
-                    rOp <= bus_if.i_data[3:0];
-                end 
-            end
-        end
-
-    end
-
-    // handle reading from the ALU
     always_comb begin
-        if (i_outputY)
-            bus_if.o_data = wResult[15:0];
-        else if (i_outputF)
-            bus_if.o_data = w_flags;
-        else
-            bus_if.o_data = 16'h0000;
+        result_flags = '0;
+
+        case (rOp)
+            ALU_ADD: begin
+                extended_result = extended_rA + extended_rB;
+                result_flags[F_CARRY] = extended_result[WORDSIZE];
+                result_flags[F_ZERO] = (extended_result == '0);
+            end
+
+            ALU_ADC: begin
+                extended_result = extended_rA + extended_rB;
+
+                if (rF[F_CARRY]) extended_result ++;
+
+                result_flags[F_CARRY] = extended_result[WORDSIZE];
+                result_flags[F_ZERO] = (extended_result == '0);
+            end
+
+            default:begin
+                extended_result = '0;
+                result_flags[F_ERROR] = 1;
+            end
+        endcase
     end
-
-    /*
-    the above always_comb block could be implemented with this assign statement:
-
-    assign bus_if.o_data = i_outputY ? wResult :
-                            i_outputF ? rFlags :
-                            16'h0000;
-    */
-
-    assign bus_if.o_valid = i_outputY | i_outputF;
 
 endmodule

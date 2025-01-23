@@ -13,7 +13,6 @@ namespace UID {
     const int REGFILE    = 0x2;
     const int DEBUG      = 0x3;
     const int STACK      = 0x4;
-    const int RFU        = 0x5;
 }
 
 namespace ALU {
@@ -31,17 +30,26 @@ namespace ALU {
         const int XOR   = 0xA;
         const int LSH   = 0xB;
         const int RSH   = 0xC;
-        const int RFU   = 0xD;
+    }
+
+    namespace COM {
+        const int LATCHA    = 1;
+        const int LATCHB    = 2;
+        const int LATCHF    = 3;
+        const int LATCHOP   = 4;
+        const int OUTPUTY   = 5;
+        const int OUTPUTF   = 6;
+        const int COMPUTE   = 7;
     }
 
     namespace FLAG {
-        const int CARRY     = 0;
-        const int ZERO      = 1;
-        const int EQUAL     = 2;
-        const int GREATER   = 3;
-        const int LESS      = 4;
-        const int BORROW    = 5;
-        const int RFU       = 6;
+        const int CARRY     = 1 << 0;
+        const int ZERO      = 1 << 1;
+        const int EQUAL     = 1 << 2;
+        const int GREATER   = 1 << 3;
+        const int LESS      = 1 << 4;
+        const int BORROW    = 1 << 5;
+        const int ERROR     = 1 << 15;
     }
 }
 
