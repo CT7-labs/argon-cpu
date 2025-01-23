@@ -2,24 +2,21 @@
 HDL_DIR = hdl
 SRC_DIR = sim
 OBJ_DIR = obj_dir
-PKG_DIR = hdl/pkg
-COMMON_DIR = hdl/common
-WAVES_DIR = waves
+PKG_DIR = $(HDL_DIR)/pkg
+COMMON_DIR = $(HDL_DIR)/common
+TESTS_DIR = $(SRC_DIR)/tests
 
 # Find SystemVerilog files
 PKG_FILES := $(wildcard $(PKG_DIR)/*.sv)
 COMMON_FILES := $(wildcard $(COMMON_DIR)/*.sv)
 VERILOG_FILES := $(wildcard $(HDL_DIR)/*.sv)
 
-# Debug prints
-$(info PKG_FILES = $(PKG_FILES))
-$(info VERILOG_FILES = $(VERILOG_FILES))
-
 # top module name
 TOP_MODULE = SimTop
 
 # C++ source in src directory
-CPP_SRC = $(SRC_DIR)/sim_main.cpp
+TEST_FILES = $(wildcard $(TESTS_DIR)/*.cpp)
+CPP_SRC = $(SRC_DIR)/sim_main.cpp $(TEST_FILES)
 
 # Executable name
 EXECUTABLE = $(OBJ_DIR)/V$(TOP_MODULE)
@@ -32,14 +29,15 @@ VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal --trace-fst -I$(HDL_DIR)
 $(shell mkdir -p $(OBJ_DIR))
 $(shell mkdir -p $(HDL_DIR))
 $(shell mkdir -p $(SRC_DIR))
+$(shell mkdir -p $(TESTS_DIR))
 
 # Default target
 all: $(EXECUTABLE)
 
 # Verilate and build
 $(EXECUTABLE):
-	$(shell mkdir -p $(WAVES_DIR))
 	@echo "Building $(EXECUTABLE)..."
+
 	verilator $(VERILATOR_FLAGS) \
 		-CFLAGS "-std=c++11" \
 		--top-module $(TOP_MODULE) \
@@ -64,6 +62,6 @@ run: $(EXECUTABLE)
 # Clean output files
 clean:
 	rm -rf $(OBJ_DIR)
-	rm -rf $(WAVES_DIR)
+	rm *.fst
 
 .PHONY: all clean run
