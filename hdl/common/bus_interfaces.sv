@@ -1,4 +1,4 @@
-import argon_pkg::*;
+import constants_pkg::*;
 
 // interfaces
 interface master_bus_if;

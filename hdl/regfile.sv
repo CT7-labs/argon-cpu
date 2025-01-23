@@ -1,4 +1,4 @@
-import argon_pkg::*;
+import constants_pkg::*;
 
 module ArgonRegFile (
     input i_Clk,

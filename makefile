@@ -32,12 +32,14 @@ $(shell mkdir -p $(SRC_DIR))
 $(shell mkdir -p $(TESTS_DIR))
 
 # Default target
-all: $(EXECUTABLE)
+all: clean build run
+
+# Build target
+build: $(EXECUTABLE)
 
 # Verilate and build
 $(EXECUTABLE):
 	@echo "Building $(EXECUTABLE)..."
-
 	verilator $(VERILATOR_FLAGS) \
 		-CFLAGS "-std=c++11" \
 		--top-module $(TOP_MODULE) \
@@ -62,6 +64,6 @@ run: $(EXECUTABLE)
 # Clean output files
 clean:
 	rm -rf $(OBJ_DIR)
-	rm *.fst
+	rm -f *.fst
 
-.PHONY: all clean run
+.PHONY: all clean run build

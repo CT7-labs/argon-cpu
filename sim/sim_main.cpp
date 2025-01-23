@@ -1,21 +1,20 @@
-#include <iostream>
 #include <verilated.h>
 #include "verilated_fst_c.h"
-#include <string.h>
 #include "VSimTop.h"
+#include <iostream>
+#include <string.h>
 #include "test_functions.h"
 
 using namespace std;
 
 // Global pointer to the top module
 VSimTop* top = nullptr;
+
+// Globals for .fst waveform dump
 VerilatedFstC* tfp = nullptr;
 vluint64_t main_time = 0;
 
-// Helper function to print results
-void printTest(const char* testName, bool passed) {
-    cout << testName << ": " << (passed ? "PASSED" : "FAILED") << std::endl;
-}
+// helpful simulation functions
 
 void simClockFall() {
     top->i_Clk = 0;
@@ -79,6 +78,8 @@ int main(int argc, char** argv) {
     
     // run test
     add37(top, tfp);
+
+    cout << "\""<< ALU::OP::LSH << "\"\n";
 
     // Cleanup
     tfp->close();

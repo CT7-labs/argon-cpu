@@ -1,4 +1,4 @@
-import argon_pkg::*;
+import constants_pkg::*;
 import alu_pkg::*;
 
 module ArgonALU (
