@@ -5,7 +5,7 @@
 #include "verilated_fst_c.h"
 #include <iostream>
 
-// shared clock functions
+// shared simulation functions
 void simClockFall();
 void simClockRise();
 void simClock(int i = 1);
