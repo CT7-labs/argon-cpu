@@ -15,7 +15,7 @@ This is a work in progress!
  - [ ] Device Controller (communicates with devices on external bus)
 
 ## Future Plans
-- [ ] Verilator simulator (not super fast, but cycle-accurate!)
-- [ ] Visual simulator (written in C++ for speed)
+- [ ] Verilator emulator (not super fast, but cycle-accurate!)
+- [ ] Emulator (written in C++ for speed)
 - [ ] Assembler (written in C++, Python, or both!)
 - [ ] Physical implementation in an iCE40HX8K FPGA 
