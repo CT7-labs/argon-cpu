@@ -4,6 +4,7 @@ SRC_DIR = sim
 OBJ_DIR = obj_dir
 PKG_DIR = hdl/pkg
 COMMON_DIR = hdl/common
+WAVES_DIR = waves
 
 # Find SystemVerilog files
 PKG_FILES := $(wildcard $(PKG_DIR)/*.sv)
@@ -25,7 +26,7 @@ EXECUTABLE = $(OBJ_DIR)/V$(TOP_MODULE)
 EXECUTABLE_FLAGS = --fromMake
 
 # Verilator flags
-VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal --trace -I$(HDL_DIR)
+VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal --trace-fst -I$(HDL_DIR)
 
 # Make sure the obj directory exists
 $(shell mkdir -p $(OBJ_DIR))
@@ -36,7 +37,8 @@ $(shell mkdir -p $(SRC_DIR))
 all: $(EXECUTABLE)
 
 # Verilate and build
-$(EXECUTABLE): $(PKG_FILES) $(COMMON_FILES) $(VERILOG_FILES) $(CPP_SRC)
+$(EXECUTABLE):
+	$(shell mkdir -p $(WAVES_DIR))
 	@echo "Building $(EXECUTABLE)..."
 	verilator $(VERILATOR_FLAGS) \
 		-CFLAGS "-std=c++11" \
@@ -62,6 +64,6 @@ run: $(EXECUTABLE)
 # Clean output files
 clean:
 	rm -rf $(OBJ_DIR)
-	rm -f *.vcd
+	rm -rf $(WAVES_DIR)
 
 .PHONY: all clean run

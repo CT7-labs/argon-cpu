@@ -1,6 +1,6 @@
 #include <iostream>
 #include <verilated.h>
-#include "verilated_vcd_c.h"
+#include "verilated_fst_c.h"
 #include <string.h>
 #include "VSimTop.h"
 
@@ -8,7 +8,7 @@ using namespace std;
 
 // Global pointer to the top module
 VSimTop* top = nullptr;
-VerilatedVcdC* tfp = nullptr;
+VerilatedFstC* tfp = nullptr;
 vluint64_t main_time = 0;
 
 // Helper function to print results
@@ -72,10 +72,9 @@ int main(int argc, char** argv) {
     top = new VSimTop;
 
     Verilated::traceEverOn(true);
-    tfp = new VerilatedVcdC;
+    tfp = new VerilatedFstC;
     top->trace(tfp, 99);  // Trace 99 levels of hierarchy
-    tfp->open("simtop.vcd");
-    
+    tfp->open("waves/simtop.fst");
     
     // Reset
     simReset();
