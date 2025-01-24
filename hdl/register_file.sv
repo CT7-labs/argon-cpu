@@ -54,6 +54,15 @@ module ArgonRegFile (
                     indexC <= bus_if.i_data[3*INDEX_WIDTH-1:2*INDEX_WIDTH];
                 end
 
+                COM_LATCHRV:
+                    regfile[RV] <= bus_if.i_data;
+
+                COM_LATCHSP:
+                    regfile[SP] <= bus_if.i_data;
+                
+                COM_LATCHF:
+                    regfile[F] <= bus_if.i_data;
+
                 default: begin
                     // nothing happens
                 end
@@ -74,14 +83,19 @@ module ArgonRegFile (
                 bus_if.o_data = (indexA != 0) ? regfile[indexB] : '0;
             end
 
+            COM_READRV: begin
+                bus_if.o_valid = 1;
+                bus_if.o_data = regfile[RV];
+            end
+
             COM_READSP: begin
                 bus_if.o_valid = 1;
-                bus_if.o_data = regfile[R_SP];
+                bus_if.o_data = regfile[SP];
             end
 
             COM_READF: begin
                 bus_if.o_valid = 1;
-                bus_if.o_data = regfile[R_F];
+                bus_if.o_data = regfile[F];
             end
 
             default: begin
