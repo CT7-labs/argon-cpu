@@ -18,8 +18,8 @@ package regfile_pkg;
     parameter REGISTERS     = 8;
     parameter INDEX_WIDTH   = 3;
 
-    parameter RV           = 7;
-    parameter SP          = 6;
-    parameter F           = 7;
+    parameter RV    = 5;
+    parameter SP    = 6;
+    parameter F     = 7;
 
 endpackage

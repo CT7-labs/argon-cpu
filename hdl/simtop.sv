@@ -113,4 +113,5 @@ module SimTop (
         .i_Clk(i_Clk),
         .i_Reset(i_Reset),
         .bus_if(regfile_bus));
+
 endmodule

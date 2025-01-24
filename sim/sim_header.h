@@ -10,9 +10,10 @@
 void simClockFall();
 void simClockRise();
 void simClock(int i = 1);
-void simReset(int i = 1);
+void simReset();
 
 // test functions
 void add37(VSimTop* top, VerilatedFstC* tfp);
+int regfile_test0(VSimTop* top, VerilatedFstC* tfp);
 
 #endif

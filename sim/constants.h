@@ -48,4 +48,42 @@ namespace ALU {
     const int F_ERROR     = 1 << 15;
 }
 
+namespace REGFILE {
+    // commands
+    const int COM_READA     = 0x1;
+    const int COM_READB     = 0x2;
+    const int COM_LATCHC    = 0x3;
+    const int COM_LATCHSEL  = 0x4;
+    const int COM_READSP    = 0x5;
+    const int COM_READF     = 0x6;
+    const int COM_SP_INC    = 0x7;
+    const int COM_SP_DEC    = 0x8;
+    const int COM_LATCHSP   = 0x9;
+    const int COM_LATCHF    = 0xA;
+    const int COM_READRV    = 0xB;
+    const int COM_LATCHRV   = 0xC;
+
+    // parameters
+    const int REGISTERS     = 8;
+    const int INDEX_WIDTH   = 3;
+
+    // registers
+    const int R0    = 0;
+    const int R1    = 1;
+    const int R2    = 2;
+    const int R3    = 3;
+    const int R4    = 4;
+    const int RV    = 5;
+    const int SP    = 6;
+    const int F     = 7;
+
+    // useful function
+    inline int getSelectBits(int reg_a, int reg_b, int reg_c) {
+        return (reg_a |
+                reg_b << INDEX_WIDTH |
+                reg_c << INDEX_WIDTH * 2)
+                & 0xFFFF;
+    }
+}
+
 #endif
