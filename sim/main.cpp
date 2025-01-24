@@ -94,7 +94,10 @@ int main(int argc, char** argv) {
     clock_count = 0;
     auto start_time = high_resolution_clock::now();
 
-    int return_code = regfile_test0(top, tfp);
+    int return_code;
+    for (int i = 0; i < 1000000; i++) {
+        return_code = regfile_test0(top, tfp);
+    }
 
     // end test
     auto end_time = high_resolution_clock::now();

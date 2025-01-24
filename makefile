@@ -15,8 +15,9 @@ VERILOG_FILES := $(wildcard $(HDL_DIR)/*.sv)
 TOP_MODULE = SimTop
 
 # C++ source in src directory
+SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
 TEST_FILES = $(wildcard $(TESTS_DIR)/*.cpp)
-CPP_SRC = $(SRC_DIR)/sim_main.cpp $(TEST_FILES)
+CPP_SRC = $(SRC_FILES) $(TEST_FILES)
 
 # Executable name
 EXECUTABLE = $(OBJ_DIR)/V$(TOP_MODULE)
