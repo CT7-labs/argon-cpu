@@ -3,7 +3,7 @@
 package constants_pkg;
     // parameters
     parameter WORDSIZE = 16;
-    parameter REGISTERS = 16;
+    parameter COMMAND_WIDTH = 4;
 
     // types
     typedef logic [WORDSIZE-1: 0] word_t;
@@ -13,7 +13,6 @@ package constants_pkg;
     parameter ID_REGFILE    = 4'h2;
     parameter ID_DEBUG      = 4'h3;
     parameter ID_STACK      = 4'h4;
-    parameter ID_RFU        = 4'h5; // reserved for future use
     // and so on...
 
 endpackage

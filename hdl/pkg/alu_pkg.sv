@@ -1,6 +1,7 @@
 package alu_pkg;
     // ALU input command constants
-    // 0 is not used for the sake of having a "NOP" signal
+
+    // 0 is NOP
     parameter COM_LATCHA    = 4'h1;
     parameter COM_LATCHB    = 4'h2;
     parameter COM_LATCHF    = 4'h3;
