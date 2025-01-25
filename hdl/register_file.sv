@@ -13,6 +13,8 @@ RV  -   General-purpose register / return value
 SP  -   Stack pointer
 F   -   Flags register
 
+The lower 8 bits of the flags register mirror the ALU's internal flags register
+
 */
 
 import constants_pkg::*;
@@ -61,7 +63,8 @@ module ArgonRegFile (
                     regfile[SP] <= bus_if.i_data;
                 
                 COM_LATCHF:
-                    regfile[F] <= bus_if.i_data;
+                    // only write to the lower 8 bits
+                    regfile[F][7:0] <= bus_if.i_data[7:0];
 
                 default: begin
                     // nothing happens

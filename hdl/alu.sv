@@ -5,8 +5,8 @@
 +---------------+
 
 - 16 opcodes
-- 16-bit arithmetic
-- 16-bit flags register
+- 16-bit unsigned arithmetic
+- 8-bit flags register (loaded with the lower 8-bits)
 - Single bus operation
 
 +-----------+
@@ -33,7 +33,8 @@ module ArgonALU (
     bus_if bus_if);
     
     // registers
-    word_t rA, rB, rF, rY;
+    word_t rA, rB, rY;
+    logic [7:0] rF;
     logic [3:0] rOp;
 
 
@@ -84,7 +85,7 @@ module ArgonALU (
             end
 
             COM_OUTPUTF: begin
-                bus_if.o_data = rF;
+                bus_if.o_data = {{WORDSIZE-8}{1'b0}, rF};
                 bus_if.o_valid = 1;
             end
 

@@ -35,6 +35,8 @@ namespace ALU {
     const int ALU_XOR   = 0xA;
     const int ALU_LSH   = 0xB;
     const int ALU_RSH   = 0xC;
+    const int ALU_ROL   = 0xD;
+    const int ALU_ROR   = 0xE;
 
     // ALU flag constants
     const int F_CARRY   = 1;

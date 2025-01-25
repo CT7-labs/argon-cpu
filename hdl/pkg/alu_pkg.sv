@@ -33,5 +33,5 @@ package alu_pkg;
     parameter F_EQUAL       = 2;
     parameter F_GREATER     = 3;
     parameter F_LESS        = 4;
-    parameter F_ERROR       = 15;
+    parameter F_ERROR       = 7;
 endpackage
