@@ -1,6 +1,6 @@
 # Directory structure
 HDL_DIR = hdl
-SRC_DIR = sim
+SRC_DIR = testbench
 OBJ_DIR = obj_dir
 PKG_DIR = $(HDL_DIR)/pkg
 COMMON_DIR = $(HDL_DIR)/common

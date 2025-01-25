@@ -1,4 +1,5 @@
 #include "testbench.h"
+#include "tests/tests.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -77,5 +78,5 @@ void cleanup() {
 }
 
 void runTest() {
-    simClock(1000);
+    alutest(top, tfp);
 }
