@@ -50,7 +50,7 @@ module ArgonALU (
         end
 
         // command interpretation
-        if (bus_if.command == COM_COMPUTE) begin
+        else if (bus_if.command == COM_COMPUTE) begin
             rY <= extended_result[WORDSIZE-1:0];
             rF <= result_flags;
         end
@@ -107,17 +107,92 @@ module ArgonALU (
         case (rOp)
             ALU_ADD: begin
                 extended_result = extended_rA + extended_rB;
+
                 result_flags[F_CARRY] = extended_result[WORDSIZE];
-                result_flags[F_ZERO] = (extended_result == '0);
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             ALU_ADC: begin
-                extended_result = extended_rA + extended_rB;
-
-                if (rF[F_CARRY]) extended_result ++;
+                extended_result = extended_rA + extended_rB + rF[F_CARRY];
 
                 result_flags[F_CARRY] = extended_result[WORDSIZE];
-                result_flags[F_ZERO] = (extended_result == '0);
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_SBC: begin
+                extended_result = extended_rA - extended_rB - ~rF[F_CARRY];
+
+                result_flags[F_CARRY] = extended_result[WORDSIZE];
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_CMP: begin
+                extended_result = {1'b0, rY}; // don't overwrite the Y register
+
+                result_flags[F_EQUAL] = extended_rA == extended_rB;
+                result_flags[F_GREATER] = extended_rA > extended_rB;
+                result_flags[F_LESS] = extended_rA < extended_rB
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0)
+            end
+
+            ALU_INC: begin
+                extended_result = extended_rA + 1;
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_DEC: begin
+                extended_result = extended_rA - 1;
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_NAND: begin
+                extended_result = ~(extended_rA & extended_rB);
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_AND: begin
+                extended_result = extended_rA & extended_rB;
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_OR: begin
+                extended_result = extended_rA | extended_rB;
+            end
+
+            ALU_NOR: begin
+                extended_result = ~(extended_rA | extended_rB);
+            end
+
+            ALU_XOR: begin
+                extended_result = extended_rA ^ extended_rB;
+            end
+
+            ALU_LSH: begin
+                extended_result = extended_rA << extended_rB[3:0];
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_RSH: begin
+                extended_result = extended_rA >> extended_rB[3:0];
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_ROL: begin
+                extended_result = extended_rA << extended_rB[3:0] | extended_rA >> (WORDSIZE - extended_rB[3:0])
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
+            ALU_ROR: begin
+                extended_result = extended_rA >> extended_rB[3:0] | extended_rA << (WORDSIZE - extended_rB[3:0])
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             default:begin

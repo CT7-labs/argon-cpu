@@ -24,6 +24,8 @@ package alu_pkg;
     parameter ALU_XOR        = 4'hA;
     parameter ALU_LSH        = 4'hB;
     parameter ALU_RSH        = 4'hC;
+    parameter ALU_ROL        = 4'hD;
+    parameter ALU_ROR        = 4'hE;
 
     // ALU flag constants
     parameter F_CARRY       = 0;

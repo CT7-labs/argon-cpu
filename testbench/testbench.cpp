@@ -78,5 +78,29 @@ void cleanup() {
 }
 
 void runTest() {
-    alutest(top, tfp);
+    clock_count = 0;
+    
+    // Start timing
+    auto start = high_resolution_clock::now();
+    
+    int return_code;
+    for (int i = 0; i < 1000000; i++) {
+        return_code = alutest(top, tfp);
+    }
+    
+    // End timing
+    auto end = high_resolution_clock::now();
+    
+    // Calculate duration in different units
+    auto duration_ns = duration_cast<nanoseconds>(end - start);
+    auto duration_us = duration_cast<microseconds>(end - start);
+    auto duration_ms = duration_cast<milliseconds>(end - start);
+
+    cout << "\n=== Simulation Stats ===\n"
+         << "Return code: " << return_code << "\n"
+         << "Clock cycles: " << clock_count << "\n"
+         << "Time (ns): " << duration_ns.count() << "\n"
+         << "Time (us): " << duration_us.count() << "\n"
+         << "Time (ms): " << duration_ms.count() << "\n"
+         << "Clock frequency: " << (clock_count * 1e9 / duration_ns.count()) << " Hz\n\n";
 }
