@@ -78,15 +78,14 @@ void cleanup() {
 }
 
 void runTest() {
+    // Start simulation
     clock_count = 0;
+    cout << "=== Simulation Begin ===\n";
     
     // Start timing
     auto start = high_resolution_clock::now();
     
-    int return_code;
-    for (int i = 0; i < 1000000; i++) {
-        return_code = alutest(top, tfp);
-    }
+    int return_code = alutest();
     
     // End timing
     auto end = high_resolution_clock::now();

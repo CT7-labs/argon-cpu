@@ -32,23 +32,23 @@ $(shell mkdir -p $(HDL_DIR))
 $(shell mkdir -p $(SRC_DIR))
 $(shell mkdir -p $(TESTS_DIR))
 
-# Default target
+# Default target is just build
+.DEFAULT_GOAL := build
+
+# All target does everything
 all: clean build run
 
 # Build target
 build: $(EXECUTABLE)
 
 # Verilate and build
-$(EXECUTABLE):
+$(EXECUTABLE): $(PKG_FILES) $(COMMON_FILES) $(VERILOG_FILES) $(CPP_SRC)
 	@echo "Building $(EXECUTABLE)..."
 	verilator $(VERILATOR_FLAGS) \
 		-CFLAGS "-std=c++11" \
 		--top-module $(TOP_MODULE) \
 		--Mdir $(OBJ_DIR) \
-		$(PKG_FILES) \
-		$(COMMON_FILES) \
-		$(VERILOG_FILES) \
-		$(CPP_SRC)
+		$^
 	@if [ ! -f $(EXECUTABLE) ]; then \
 		echo "Error: Build failed - executable not created"; \
 		exit 1; \
@@ -60,6 +60,7 @@ run: $(EXECUTABLE)
 		echo "Error: $(EXECUTABLE) not found or not executable"; \
 		exit 1; \
 	fi
+
 	$(EXECUTABLE) $(EXECUTABLE_FLAGS)
 
 # Clean output files

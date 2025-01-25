@@ -3,6 +3,9 @@
 
 #include "../testbench.h"
 
-int alutest(VSimTop* top, VerilatedFstC* tfp);
+extern VSimTop* top;
+extern VerilatedFstC* tfp;
+
+int alutest();
 
 #endif

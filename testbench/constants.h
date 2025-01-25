@@ -22,21 +22,21 @@ namespace ALU {
     const int COM_COMPUTE   = 0x7;
 
     // opcodes
-    const int ALU_ADD   = 0x0;
-    const int ALU_ADC   = 0x1;
-    const int ALU_SBC   = 0x2;
-    const int ALU_CMP   = 0x3;
-    const int ALU_INC   = 0x4;
-    const int ALU_DEC   = 0x5;
-    const int ALU_NAND  = 0x6;
-    const int ALU_AND   = 0x7;
-    const int ALU_OR    = 0x8;
-    const int ALU_NOR   = 0x9;
-    const int ALU_XOR   = 0xA;
-    const int ALU_LSH   = 0xB;
-    const int ALU_RSH   = 0xC;
-    const int ALU_ROL   = 0xD;
-    const int ALU_ROR   = 0xE;
+    const int OP_ADD   = 0x0;
+    const int OP_ADC   = 0x1;
+    const int OP_SBC   = 0x2;
+    const int OP_CMP   = 0x3;
+    const int OP_INC   = 0x4;
+    const int OP_DEC   = 0x5;
+    const int OP_NAND  = 0x6;
+    const int OP_AND   = 0x7;
+    const int OP_OR    = 0x8;
+    const int OP_NOR   = 0x9;
+    const int OP_XOR   = 0xA;
+    const int OP_LSH   = 0xB;
+    const int OP_RSH   = 0xC;
+    const int OP_ROL   = 0xD;
+    const int OP_ROR   = 0xE;
 
     // ALU flag constants
     const int F_CARRY   = 1;
@@ -44,7 +44,7 @@ namespace ALU {
     const int F_EQUAL   = 1 << 2;
     const int F_GREATER = 1 << 3;
     const int F_LESS    = 1 << 4;
-    const int F_ERROR   = 1 << 15;
+    const int F_ERROR   = 1 << 7;
 }
 
 namespace REGFILE {

@@ -11,6 +11,9 @@
 #include <chrono>
 #include <string.h>
 
+// helpfuls
+#include "constants.h"
+
 // helpful testbench functions
 void simClockFall();
 void simClockRise();

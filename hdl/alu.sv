@@ -85,7 +85,7 @@ module ArgonALU (
             end
 
             COM_OUTPUTF: begin
-                bus_if.o_data = {{WORDSIZE-8}{1'b0}, rF};
+                bus_if.o_data = {{{WORDSIZE-8}{1'b0}}, rF};
                 bus_if.o_valid = 1;
             end
 
@@ -132,8 +132,8 @@ module ArgonALU (
 
                 result_flags[F_EQUAL] = extended_rA == extended_rB;
                 result_flags[F_GREATER] = extended_rA > extended_rB;
-                result_flags[F_LESS] = extended_rA < extended_rB
-                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0)
+                result_flags[F_LESS] = extended_rA < extended_rB;
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             ALU_INC: begin
@@ -185,13 +185,13 @@ module ArgonALU (
             end
 
             ALU_ROL: begin
-                extended_result = extended_rA << extended_rB[3:0] | extended_rA >> (WORDSIZE - extended_rB[3:0])
+                extended_result = extended_rA << extended_rB[3:0] | extended_rA >> (WORDSIZE - extended_rB[3:0]);
 
                 result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             ALU_ROR: begin
-                extended_result = extended_rA >> extended_rB[3:0] | extended_rA << (WORDSIZE - extended_rB[3:0])
+                extended_result = extended_rA >> extended_rB[3:0] | extended_rA << (WORDSIZE - extended_rB[3:0]);
 
                 result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
