@@ -121,7 +121,7 @@ module ArgonALU (
             end
 
             ALU_SBC: begin
-                extended_result = extended_rA - extended_rB - ~rF[F_CARRY];
+                extended_result = extended_rA - extended_rB - !rF[F_CARRY];
 
                 result_flags[F_CARRY] = extended_result[WORDSIZE];
                 result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);

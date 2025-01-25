@@ -38,6 +38,25 @@ namespace ALU {
     const int OP_ROL   = 0xD;
     const int OP_ROR   = 0xE;
 
+    static const char* opnames[] = {
+        "ADD",
+        "ADC",
+        "SBC",
+        "CMP",
+        "INC",
+        "DEC",
+        "NAND",
+        "AND",
+        "OR",
+        "NOR",
+        "XOR",
+        "LSH",
+        "RSH",
+        "ROL",
+        "ROR",
+        "NOP"
+    };
+
     // ALU flag constants
     const int F_CARRY   = 1;
     const int F_ZERO    = 1 << 1;
