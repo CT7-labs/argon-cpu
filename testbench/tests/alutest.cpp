@@ -106,6 +106,7 @@ void printResult(result_t result) {
 
     std::cout << "Flags:\n";
     printFlags(result.flags);
+    std::cout << "\n";
 }
 
 // actual test
@@ -117,11 +118,15 @@ int alutest() {
     int carry = 0;
 
     result_t result;
-    result = alu_compute(a, b, ALU::OP_SBB, carry);
+    result = alu_compute(a, b, ALU::OP_SBB, 0);
 
     printResult(result);
 
-    result = alu_compute(b, a, ALU::OP_SBB, carry);
+    result = alu_compute(b, a, ALU::OP_SBB, result.flags);
+
+    printResult(result);
+
+    result = alu_compute(a, b, ALU::OP_SBB, result.flags);
 
     printResult(result);
 

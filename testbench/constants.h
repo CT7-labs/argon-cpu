@@ -24,23 +24,25 @@ namespace ALU {
     // opcodes
     const int OP_ADD   = 0x0;
     const int OP_ADC   = 0x1;
-    const int OP_SBB   = 0x2;
-    const int OP_CMP   = 0x3;
-    const int OP_INC   = 0x4;
-    const int OP_DEC   = 0x5;
-    const int OP_NAND  = 0x6;
-    const int OP_AND   = 0x7;
-    const int OP_OR    = 0x8;
-    const int OP_NOR   = 0x9;
-    const int OP_XOR   = 0xA;
-    const int OP_LSH   = 0xB;
-    const int OP_RSH   = 0xC;
-    const int OP_ROL   = 0xD;
-    const int OP_ROR   = 0xE;
+    const int OP_SUB   = 0x2;
+    const int OP_SBB   = 0x3;
+    const int OP_CMP   = 0x4;
+    const int OP_INC   = 0x5;
+    const int OP_DEC   = 0x6;
+    const int OP_NAND  = 0x7;
+    const int OP_AND   = 0x8;
+    const int OP_OR    = 0x9;
+    const int OP_NOR   = 0xA;
+    const int OP_XOR   = 0xB;
+    const int OP_LSH   = 0xC;
+    const int OP_RSH   = 0xD;
+    const int OP_ROL   = 0xE;
+    const int OP_ROR   = 0xF;
 
     static const char* opnames[] = {
         "ADD",
         "ADC",
+        "SUB",
         "SBB",
         "CMP",
         "INC",
@@ -53,8 +55,7 @@ namespace ALU {
         "LSH",
         "RSH",
         "ROL",
-        "ROR",
-        "NOP"
+        "ROR"
     };
 
     // ALU flag constants

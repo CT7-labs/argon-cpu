@@ -21,6 +21,70 @@
 6. Output result
 7. Output flags
 
++------------------------+
+|   Intended functions   |
++------------------------+
+
+ADD
+Y = A + B
+
+flags updated: Carry, Zero
+
+ADC
+Y = A + B + CF
+
+flags updated: Carry, Zero
+
+SUB
+Y = A - B
+
+flags updated: borrow, zero
+
+SBB
+Y = A - B - BF
+
+flags updated: Borrow, Zero
+
+CMP
+Y = Y
+
+greater: a > b
+less: a < b
+equal: a == b
+
+INC
+Y = A + 1
+
+DEC
+Y = A - 1
+
+NAND
+Y = ~(A & B)
+
+AND
+Y = A & B
+
+OR
+Y = A | B
+
+NOR
+Y = ~(A | B)
+
+XOR
+Y = A ^ B
+
+LSH
+Y = A << B
+
+RSH
+Y = A >> B
+
+ROL
+Y = (A << B) | (A >> WORDSIZE - B)
+
+ROR
+Y = (A << WORDSIZE - B) | (A >> B)
+
 */
 
 import constants_pkg::*;
@@ -120,6 +184,13 @@ module ArgonALU (
                 result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
+            ALU_SUB: begin
+                extended_result = extended_rA - extended_rB;;
+
+                result_flags[F_BORROW] = extended_rA < extended_rB;
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
+            end
+
             ALU_SBB: begin
                 extended_result = extended_rA - extended_rB - rF[F_BORROW];
 
@@ -133,7 +204,6 @@ module ArgonALU (
                 result_flags[F_EQUAL] = extended_rA == extended_rB;
                 result_flags[F_GREATER] = extended_rA > extended_rB;
                 result_flags[F_LESS] = extended_rA < extended_rB;
-                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             ALU_INC: begin
