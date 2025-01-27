@@ -8,12 +8,10 @@ package regfile_pkg;
     parameter COM_LATCHSEL  = 'h4;
     parameter COM_READSP    = 'h5;
     parameter COM_READF     = 'h6;
-    parameter COM_SP_INC    = 'h7;
-    parameter COM_SP_DEC    = 'h8;
-    parameter COM_LATCHSP   = 'h9;
-    parameter COM_LATCHF    = 'hA;
-    parameter COM_READRV    = 'hB;
-    parameter COM_LATCHRV   = 'hC;
+    parameter COM_READRV    = 'h7;
+    parameter COM_LATCHSP   = 'h8;
+    parameter COM_LATCHF    = 'h9;
+    parameter COM_LATCHRV   = 'hA;
 
     parameter REGISTERS     = 8;
     parameter INDEX_WIDTH   = 3;

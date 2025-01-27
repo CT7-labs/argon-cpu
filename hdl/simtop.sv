@@ -25,6 +25,8 @@ module SimTop (
 
     bus_if alu_bus();
     bus_if regfile_bus();
+    bus_if stack_bus();
+    
     bus_if debug_bus();
     assign i_debug = debug_bus.i_data;
     assign i_debug_valid = debug_bus.i_valid;
@@ -59,6 +61,15 @@ module SimTop (
                 regfile_bus.command = write_command;
             end
 
+            ID_STACK: begin
+                if (stack_bus.o_valid) begin
+                    master_bus.o_data = stack_bus.o_data;
+                    master_bus.o_valid = stack_bus.o_valid;
+                end
+
+                stack_bus.command = write_command;
+            end
+
             ID_DEBUG: begin
                 if (debug_bus.o_valid) begin
                     master_bus.o_data = debug_bus.o_data;
@@ -69,7 +80,8 @@ module SimTop (
             default: begin
                 alu_bus.command = 0;
                 regfile_bus.command = 0;
-            end
+                stack_bus.command = 0;
+            end 
         endcase
 
         // handle units reading from the bus
@@ -86,24 +98,29 @@ module SimTop (
                 regfile_bus.command = master_bus.read_command;
             end
 
+            ID_STACK: begin
+                stack_bus.i_data = master_bus.o_data;
+                stack_bus.i_valid = master_bus.o_valid;
+                stack_bus.command = master_bus.read_command;
+            end
+
             ID_DEBUG: begin
                 debug_bus.i_data = master_bus.o_data;
                 debug_bus.i_valid = master_bus.o_valid;
             end
 
             default: begin
-                master_bus.i_data = master_bus.o_data;
+                master_bus.i_data = '0;
                 master_bus.i_valid = 0;
 
                 alu_bus.command = 0;
                 regfile_bus.command = 0;
+                stack_bus.command = 0;
             end
         endcase
     end
 
-    // device instances
-
-    // ALU
+    // unit instances
     ArgonALU inst_ArgonALU (
         .i_Clk(i_Clk),
         .i_Reset(i_Reset),
@@ -113,5 +130,10 @@ module SimTop (
         .i_Clk(i_Clk),
         .i_Reset(i_Reset),
         .bus_if(regfile_bus));
+
+    ArgonStack inst_ArgonStack (
+        .i_Clk(i_Clk),
+        .i_Reset(i_Reset),
+        .bus_if(stack_bus));
 
 endmodule

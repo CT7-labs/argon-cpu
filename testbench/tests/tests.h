@@ -7,5 +7,6 @@ extern VSimTop* top;
 extern VerilatedFstC* tfp;
 
 int alutest();
+int stacktest();
 
 #endif
