@@ -69,7 +69,7 @@ result_t alu_compute(int a, int b, int op, int f) {
 // pretty printing
 void printFlags(int flags) {
     // Print flags in binary
-    std::cout << "  E--LGEZC\n  ";
+    std::cout << "  E-BLGEZC\n  ";
     for (int i = 7; i >= 0; i--) {
         std::cout << ((flags >> i) & 1);
     }
@@ -117,25 +117,13 @@ int alutest() {
     int carry = 0;
 
     result_t result;
-    result = alu_compute(a, b, ALU::OP_SBC, carry);
+    result = alu_compute(a, b, ALU::OP_SBB, carry);
 
-    // Extend to 17 bits, perform subtraction, then mask to 16 bits
-    uint32_t ext_a = a;
-    uint32_t ext_b = b;
-    uint32_t ext_result = ext_a - ext_b - (!carry);
-    uint16_t cpp_result = ext_result & 65535;
+    printResult(result);
 
-    std::cout << "C++ subtract (carry = 0): " << cpp_result << "\n";
-    std::cout << "Verilog SBC (carry = 0): " << result.value << "\n";
+    result = alu_compute(b, a, ALU::OP_SBB, carry);
 
-    carry = 1;
-    result = alu_compute(a, b, ALU::OP_SBC, carry);
-    
-    ext_result = ext_a - ext_b - (!carry);
-    cpp_result = ext_result & 65535;
-
-    std::cout << "C++ subtract (carry = 1): " << cpp_result << "\n";
-    std::cout << "Verilog SBC (carry = 1): " << result.value << "\n";
+    printResult(result);
 
     simReset();
 

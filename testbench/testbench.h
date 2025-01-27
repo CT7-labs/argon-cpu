@@ -14,13 +14,12 @@
 
 #include "constants.h"
 
-// helpful testbench functions
+// testbench functions
 void simClockFall();
 void simClockRise();
 void simClock(int i = 1);
 void simReset();
 
-// critical testbench functions
 void initTestbench(int argc, char** argv);
 void runTest();
 void cleanup();

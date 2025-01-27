@@ -24,7 +24,7 @@ namespace ALU {
     // opcodes
     const int OP_ADD   = 0x0;
     const int OP_ADC   = 0x1;
-    const int OP_SBC   = 0x2;
+    const int OP_SBB   = 0x2;
     const int OP_CMP   = 0x3;
     const int OP_INC   = 0x4;
     const int OP_DEC   = 0x5;
@@ -41,7 +41,7 @@ namespace ALU {
     static const char* opnames[] = {
         "ADD",
         "ADC",
-        "SBC",
+        "SBB",
         "CMP",
         "INC",
         "DEC",
@@ -63,6 +63,7 @@ namespace ALU {
     const int F_EQUAL   = 1 << 2;
     const int F_GREATER = 1 << 3;
     const int F_LESS    = 1 << 4;
+    const int F_BORROW  = 1 << 5;
     const int F_ERROR   = 1 << 7;
 }
 

@@ -120,10 +120,10 @@ module ArgonALU (
                 result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
-            ALU_SBC: begin
-                extended_result = extended_rA - extended_rB - !rF[F_CARRY];
+            ALU_SBB: begin
+                extended_result = extended_rA - extended_rB - rF[F_BORROW];
 
-                result_flags[F_CARRY] = extended_result[WORDSIZE];
+                result_flags[F_BORROW] = extended_rA < extended_rB;
                 result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 

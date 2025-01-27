@@ -13,7 +13,7 @@ package alu_pkg;
     // ALU operation constants (4-bit opcode for now)
     parameter ALU_ADD        = 4'h0;
     parameter ALU_ADC        = 4'h1;
-    parameter ALU_SBC        = 4'h2;
+    parameter ALU_SBB        = 4'h2;
     parameter ALU_CMP        = 4'h3;
     parameter ALU_INC        = 4'h4;
     parameter ALU_DEC        = 4'h5;
@@ -33,5 +33,6 @@ package alu_pkg;
     parameter F_EQUAL       = 2;
     parameter F_GREATER     = 3;
     parameter F_LESS        = 4;
+    parameter F_BORROW      = 5;
     parameter F_ERROR       = 7;
 endpackage
