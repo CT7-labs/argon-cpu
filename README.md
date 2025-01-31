@@ -9,7 +9,7 @@ This is a work in progress!
  - [x] Register File
  - [ ] Control Unit
  - [ ] Memory Controller
- - [ ] Stack
+ - [X] Stack
  - [ ] Program Counter
  - [ ] Interrupt Handler
  - [ ] Device Controller (communicates with devices on external bus)
