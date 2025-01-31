@@ -17,7 +17,7 @@ package regfile_pkg;
     parameter INDEX_WIDTH   = 3;
 
     parameter RV    = 5;
-    parameter SP    = 6;
-    parameter F     = 7;
+    parameter SP    = 7;
+    parameter F     = 6;
 
 endpackage

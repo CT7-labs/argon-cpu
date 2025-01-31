@@ -113,18 +113,13 @@ int alutest() {
     
     int a = 10;
     int b = 8;
-    int carry = 0;
 
     result_t result;
-    result = alu_compute(a, b, ALU::OP_SBB, 0);
+    result = alu_compute(a, b, ALU::OP_ADD, ALU::F_CARRY);
 
     printResult(result);
 
-    result = alu_compute(b, a, ALU::OP_SBB, result.flags);
-
-    printResult(result);
-
-    result = alu_compute(a, b, ALU::OP_SBB, result.flags);
+    result = alu_compute(a, b, ALU::OP_ADC, ALU::F_CARRY);
 
     printResult(result);
 
