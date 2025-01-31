@@ -83,7 +83,7 @@ module ArgonRegFile (
 
             COM_READB: begin
                 bus_if.o_valid = 1;
-                bus_if.o_data = (indexA != 0) ? regfile[indexB] : '0;
+                bus_if.o_data = (indexB != 0) ? regfile[indexB] : '0;
             end
 
             COM_READRV: begin
