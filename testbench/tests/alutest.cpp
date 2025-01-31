@@ -1,8 +1,6 @@
 #include "tests.h"
 #include <random>
 
-using namespace std;
-
 struct result_t {
     int a, b, op, f;
     int value;

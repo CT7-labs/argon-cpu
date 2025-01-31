@@ -10,5 +10,6 @@ extern VerilatedFstC* tfp;
 // test functions
 int alutest();
 int stacktest();
+int regfiletest();
 
 #endif
