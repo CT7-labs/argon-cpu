@@ -1,4 +1,5 @@
 #include "tests.h"
+#include "regfile_functions.h"
 
 void indexSelect(int a, int b, int c) {
     top->read_id = ID_REGFILE;
