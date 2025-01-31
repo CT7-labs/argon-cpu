@@ -11,13 +11,6 @@ module Mem256x16 (
     
     reg [15:0] memory [0:255];
     
-    // remove these mem_N registers
-    word_t mem_0 = memory[0];
-    word_t mem_1 = memory[1];
-    word_t mem_2 = memory[2];
-    word_t mem_3 = memory[3];
-    word_t mem_4 = memory[4];
-
     // Registered outputs to match SB_RAM256x16
     always @(posedge clk) begin
         if (rd_en) begin
