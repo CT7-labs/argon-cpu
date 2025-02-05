@@ -121,13 +121,6 @@ module SimTop (
         endcase
     end
 
-    // Intermediate wires for ALU-RegFile connections
-    word_t reg_a;
-    word_t reg_b;
-    word_t reg_flags;
-    word_t write_data;
-    regfile_alu_shared_pkg::write_sel_t write_select;
-
     // unit instances
     ArgonALU inst_ArgonALU (
         .i_Clk(i_Clk),
@@ -141,6 +134,13 @@ module SimTop (
         .o_write_data(write_data),
         .o_write_select(write_select)
         );
+
+    // Intermediate wires for ALU<->RegFile connections
+    word_t reg_a;
+    word_t reg_b;
+    word_t reg_flags;
+    word_t write_data;
+    regfile_alu_shared_pkg::write_sel_t write_select;
 
     ArgonRegFile inst_ArgonRegFile (
         .i_Clk(i_Clk),
