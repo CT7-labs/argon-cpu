@@ -93,8 +93,8 @@ namespace REGFILE {
     const int R3    = 3;
     const int R4    = 4;
     const int RV    = 5;
-    const int SP    = 6;
-    const int F     = 7;
+    const int SP    = 7;
+    const int F     = 6;
 }
 
 namespace STACK {
@@ -107,4 +107,3 @@ namespace STACK {
 }
 
 #endif
-

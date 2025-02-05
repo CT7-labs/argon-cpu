@@ -62,9 +62,10 @@ module ArgonRegFile (
                 COM_LATCHSP:
                     regfile[SP] <= bus_if.i_data;
                 
-                COM_LATCHF:
+                COM_LATCHF: begin
                     // only write to the lower 8 bits
-                    regfile[F][7:0] <= bus_if.i_data[7:0];
+                    regfile[F] <= bus_if.i_data;
+                end
 
                 default: begin
                     // nothing happens
@@ -72,7 +73,7 @@ module ArgonRegFile (
             endcase
         end
     end
-
+    
     // read from regfile
     always_comb begin
         case (bus_if.command)

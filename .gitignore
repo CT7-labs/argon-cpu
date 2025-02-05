@@ -1,2 +1,3 @@
 *.fst
+*.gtkw
 obj_dir/

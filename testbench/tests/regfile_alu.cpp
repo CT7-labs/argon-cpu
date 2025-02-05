@@ -33,6 +33,7 @@ void regfile_compute(int op, int regA, int regB, int regC) {
     // compute
     top->read_command = ALU::COM_COMPUTE;
     top->write_command = 0; // don't do anything
+    top->write_id = ID_DEBUG;
     simClock();
 
     // write result and flags to register file
@@ -49,12 +50,21 @@ void regfile_compute(int op, int regA, int regB, int regC) {
 }
 
 int regfile_alu() {
-    indexSelect(REGFILE::R1, REGFILE::R2, REGFILE::R1);
-    latchC(255);
-    indexSelect(REGFILE::R1, REGFILE::R2, REGFILE::R2);
-    latchC(255);
+    simReset();
 
-    regfile_compute(ALU::OP_ADD, REGFILE::R1, REGFILE::R2, REGFILE::R3);
+    indexSelect(REGFILE::R1, REGFILE::R2, REGFILE::R1);
+    latchC(256);
+    indexSelect(REGFILE::R1, REGFILE::R2, REGFILE::R2);
+    latchC(256);
+
+    latchF(0xFF);
+    regfile_compute(ALU::OP_ADC, REGFILE::R1, REGFILE::R2, REGFILE::R1);
+    
+    int value = readA();
+
+    std::cout << value << "\n";
+
+    simReset();
 
     return 0;
 }
