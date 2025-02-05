@@ -86,6 +86,37 @@ void compute(int op, int a, int b, int c) {
     simClock();
 }
 
+void push(int reg_a) {
+    selectRegisters(reg_a, 0, 0);
+
+    // pass reg_a to stack
+    top->read_id = ID_STACK;
+    top->write_id = ID_REGFILE;
+    top->o_debug_valid = 0;
+
+    top->write_command = REGFILE::COM_READA;
+    top->read_command = STACK::COM_PUSH;
+
+    simClock();
+
+    top->write_command = 0;
+    top->read_command = 0;
+}
+
+void pop(int reg_c) {
+    selectRegisters(0, 0, reg_c);
+
+    top->read_id = ID_REGFILE;
+    top->write_id = ID_STACK;
+
+    top->write_command = STACK::COM_POP;
+    top->read_command = REGFILE::COM_LATCHC;
+
+    simClock(2);
+
+    top->write_command = 0;
+    top->read_command = 0;
+}
 int regfile_alu_test() {
     simReset();
 
@@ -102,6 +133,15 @@ int regfile_alu_test() {
 
     std::cout << readA() << "\n";
     std::cout << readF() << "\n";
+
+    // push GP1 into stack
+    push(R_GP1);
+
+    // pop stack into GP3
+    pop(R_GP3);
+    selectRegisters(R_GP3, 0, 0);
+
+    std::cout << readA() << "\n";
 
     simReset();
     return 0;

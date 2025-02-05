@@ -116,22 +116,25 @@ module ArgonALU (
         end
 
         // command interpretation
-        else if (bus_if.command == COM_WRITEC) begin
-            o_write_select <= WSEL_REGC;
-            o_write_data <= extended_result[WORDSIZE-1:0];
-        end
-
-        else if (bus_if.command == COM_WRITEF) begin
-            o_write_select <= WSEL_REGF;
-            o_write_data <= {i_reg_flags[WORDSIZE-1:8], result_flags[7:0]};
-        end
-
         else if (bus_if.i_valid) begin
             if (bus_if.command == COM_LATCHOP) rOp <= bus_if.i_data[3:0];
         end
     end
 
     always_comb begin
+        // handle writing to RegFile
+        if (bus_if.command == COM_WRITEC) begin
+            o_write_select = WSEL_REGC;
+            o_write_data = extended_result[WORDSIZE-1:0];
+        end
+        else if (bus_if.command == COM_WRITEF) begin
+            o_write_select = WSEL_REGF;
+            o_write_data = {i_reg_flags[WORDSIZE-1:8], result_flags[7:0]};
+        end
+        else o_write_select = '0;
+
+        // handle computing
+
         result_flags = '0;
 
         case (rOp)
