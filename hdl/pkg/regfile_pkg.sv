@@ -22,7 +22,8 @@ package regfile_pkg;
         COM_LATCHC   = 4'h3,  // Write to register C
         COM_LATCHSEL = 4'h4,  // Update register select values
         COM_READF    = 4'h5,  // Read flags register
-        COM_SLAVE    = 4'h6   // ALU write enable
+        COM_ALU_WE   = 4'h6,  // ALU write enable
+        COM_SP_WE    = 4'h7   // Stack pointer write enable  
     } command_t;
 
     // Register addresses
@@ -32,7 +33,7 @@ package regfile_pkg;
         R_GP2  = 3'b010,  // General purpose 2
         R_GP3  = 3'b011,  // General purpose 3
         R_GP4  = 3'b100,  // General purpose 4
-        R_RV   = 3'b101,  // Return value
+        R_GP5  = 3'b101,  // General purpose 5
         R_SP   = 3'b110,  // Stack pointer
         R_F    = 3'b111   // Flags register
     } reg_addr_t;

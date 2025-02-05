@@ -27,11 +27,11 @@ module ArgonRegFile (
     bus_if bus_if,
 
     // communication between RegFile and ALU
-    word_t o_reg_a,
-    word_t o_reg_b,
-    word_t o_reg_flags,
-    word_t i_write_data,
-    write_sel_t i_write_select); // set to 0 to disable writing
+    output word_t o_reg_a,
+    output word_t o_reg_b,
+    output word_t o_reg_flags,
+    input word_t i_write_data,
+    input write_sel_t i_write_select); // set to 0 to disable writing
 
     // define registers
     word_t registers [1:REGISTERS-1];
@@ -81,11 +81,13 @@ module ArgonRegFile (
         else begin
             // handle writes from ALU to register file
             // if control unit OKs it
-            if (bus_if.command == COM_SLAVE) begin
+            if (bus_if.command == COM_ALU_WE) begin
                 case (i_write_select)
                     WSEL_REGC: registers[selC] <= i_write_data;
                     WSEL_REGF: registers[R_F] <= i_write_data;
-                    default: // nothing
+                    default: begin
+                        // nothing
+                    end
                 endcase
             end
             
@@ -93,7 +95,7 @@ module ArgonRegFile (
             // write to registers[selC] with data from bus
             if (bus_if.command == COM_LATCHC && selC != 0) begin
                 if (bus_if.i_valid) registers[selC] <= bus_if.i_data;
-                else bus_if.error <= ERROR_INVALID_INPUT_DATA; 
+                else bus_if.error <= ERROR_INVALID_INPUT; 
             end
 
             // update selected registers with data from bus

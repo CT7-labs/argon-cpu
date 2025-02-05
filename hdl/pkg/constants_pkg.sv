@@ -1,22 +1,25 @@
-// package for Argon v1.5
-
 package constants_pkg;
-    // parameters
-    parameter WORDSIZE = 16;
-    parameter COMMAND_WIDTH = 4;
+    // Core CPU parameters
+    parameter WORDSIZE       = 16;
+    parameter COMMAND_WIDTH  = 4;
+    parameter ERROR_WIDTH    = 4;
 
-    // types
-    typedef logic [WORDSIZE-1: 0] word_t;
+    // Common types
+    typedef logic [WORDSIZE-1:0] word_t;
+    typedef logic [COMMAND_WIDTH-1:0] command_t;
 
-    // bus unit IDs
-    parameter ID_ALU        = 4'h1;
-    parameter ID_REGFILE    = 4'h2;
-    parameter ID_DEBUG      = 4'h3;
-    parameter ID_STACK      = 4'h4;
-    // and so on...
+    // Bus unit IDs
+    typedef enum command_t {
+        ID_ALU     = 4'h1,
+        ID_REGFILE = 4'h2,
+        ID_DEBUG   = 4'h3,
+        ID_STACK   = 4'h4
+    } unit_id_t;
 
-    // errors
-    // '0 is no error
-    parameter ERROR_INVALID_INPUT_DATA = '1;
+    // Error codes
+    typedef enum logic [ERROR_WIDTH-1:0] {
+        ERROR_NONE           = '0,
+        ERROR_INVALID_INPUT  = '1
+    } error_t;
 
 endpackage
