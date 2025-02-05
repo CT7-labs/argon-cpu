@@ -19,87 +19,45 @@ The lower 8 bits of the flags register mirror the ALU's internal flags register
 
 import constants_pkg::*;
 import regfile_pkg::*;
+import regfile_alu_shared_pkg::*;
 
 module ArgonRegFile (
     input i_Clk,
     input i_Reset,
-    bus_if bus_if);
+    bus_if bus_if,
 
-    // define register file and index registers
-    word_t [15:0] regfile [1:REGISTERS-1]; // saves LEs by not defining a zero register
-    logic [INDEX_WIDTH-1:0] indexA, indexB, indexC;
+    // communication between RegFile and ALU
+    word_t o_reg_a,
+    word_t o_reg_b,
+    word_t o_reg_flags,
+    word_t i_write_data,
+    write_sel_t i_write_select); // set to 0 to disable writing
 
-    always_ff @(posedge i_Clk or posedge i_Reset) begin
-        if (i_Reset) begin
-            for (int i = 1; i < REGISTERS; i++) begin
-                regfile[i] <= '0;
-            end
+    // define registers
+    word_t registers [1:REGISTERS-1];
+    reg_addr_t selA, selB, selC;
 
-            indexA <= '0;
-            indexB <= '0;
-            indexC <= '0;
-        end
+    // assign outputs to ALU
+    assign o_reg_a     = registers[selA];
+    assign o_reg_b     = registers[selB];
+    assign o_reg_flags = registers[R_F];
 
-        // write to regfile
-        else if (bus_if.i_valid) begin
-            case (bus_if.command)
-
-                // write to regC
-                COM_LATCHC:
-                    if (indexC != 0)
-                        regfile[indexC] <= bus_if.i_data;
-                
-                // latch new indices for regA, B, and C
-                COM_LATCHSEL: begin
-                    indexA <= bus_if.i_data[INDEX_WIDTH-1:0];
-                    indexB <= bus_if.i_data[2*INDEX_WIDTH-1:INDEX_WIDTH];
-                    indexC <= bus_if.i_data[3*INDEX_WIDTH-1:2*INDEX_WIDTH];
-                end
-
-                COM_LATCHRV:
-                    regfile[RV] <= bus_if.i_data;
-
-                COM_LATCHSP:
-                    regfile[SP] <= bus_if.i_data;
-                
-                COM_LATCHF: begin
-                    // only write to the lower 8 bits
-                    regfile[F] <= bus_if.i_data;
-                end
-
-                default: begin
-                    // nothing happens
-                end
-            endcase
-        end
-    end
-    
-    // read from regfile
+    // handle outputs to Argon bus
     always_comb begin
         case (bus_if.command)
             COM_READA: begin
                 bus_if.o_valid = 1;
-                bus_if.o_data = (indexA != 0) ? regfile[indexA] : '0;
+                bus_if.o_data = (selA != 0) ? registers[selA] : '0;
             end
 
             COM_READB: begin
                 bus_if.o_valid = 1;
-                bus_if.o_data = (indexB != 0) ? regfile[indexB] : '0;
-            end
-
-            COM_READRV: begin
-                bus_if.o_valid = 1;
-                bus_if.o_data = regfile[RV];
-            end
-
-            COM_READSP: begin
-                bus_if.o_valid = 1;
-                bus_if.o_data = regfile[SP];
+                bus_if.o_data = (selB != 0) ? registers[selB] : '0;
             end
 
             COM_READF: begin
                 bus_if.o_valid = 1;
-                bus_if.o_data = regfile[F];
+                bus_if.o_data = registers[R_F];
             end
 
             default: begin
@@ -107,6 +65,46 @@ module ArgonRegFile (
                 bus_if.o_data = '0;
             end
         endcase
+    end
+
+    always_ff @(posedge i_Clk or posedge i_Reset) begin
+        if (i_Reset) begin
+            selA <= '0;
+            selB <= '0;
+            selC <= '0;
+
+            for (int i = 1; i < REGISTERS; i++) begin
+                registers[i] <= 0;
+            end
+        end
+
+        else begin
+            // handle writes from ALU to register file
+            // if control unit OKs it
+            if (bus_if.command == COM_SLAVE) begin
+                case (i_write_select)
+                    WSEL_REGC: registers[selC] <= i_write_data;
+                    WSEL_REGF: registers[R_F] <= i_write_data;
+                    default: // nothing
+                endcase
+            end
+            
+
+            // write to registers[selC] with data from bus
+            if (bus_if.command == COM_LATCHC && selC != 0) begin
+                if (bus_if.i_valid) registers[selC] <= bus_if.i_data;
+                else bus_if.error <= ERROR_INVALID_INPUT_DATA; 
+            end
+
+            // update selected registers with data from bus
+            if (bus_if.command == COM_LATCHSEL) begin
+                if (bus_if.i_valid) begin
+                    selA <= bus_if.i_data[INDEX_WIDTH-1:0];
+                    selB <= bus_if.i_data[2*INDEX_WIDTH-1:INDEX_WIDTH];
+                    selC <= bus_if.i_data[3*INDEX_WIDTH-1:INDEX_WIDTH*2];
+                end
+            end
+        end
     end
 
 endmodule
