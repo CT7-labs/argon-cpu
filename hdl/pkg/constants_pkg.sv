@@ -15,4 +15,8 @@ package constants_pkg;
     parameter ID_STACK      = 4'h4;
     // and so on...
 
+    // errors
+    // '0 is no error
+    parameter ERROR_INVALID_INPUT_DATA = '1;
+
 endpackage
