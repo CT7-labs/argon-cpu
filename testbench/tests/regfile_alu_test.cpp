@@ -70,6 +70,7 @@ void compute(int op, int a, int b, int c) {
     // pass a command to both modules
     top->read_id = ID_REGFILE;
     top->write_id = ID_ALU;
+    top->o_debug_valid = 0;
 
     top->read_command = REGFILE::COM_ALU_WE;
     top->write_command = ALU::COM_WRITEC;
@@ -80,6 +81,7 @@ void compute(int op, int a, int b, int c) {
     // pass a command to both modules
     top->read_id = ID_REGFILE;
     top->write_id = ID_ALU;
+    top->o_debug_valid = 0;
 
     top->read_command = REGFILE::COM_ALU_WE;
     top->write_command = ALU::COM_WRITEF;
@@ -117,19 +119,24 @@ void pop(int reg_c) {
     top->write_command = 0;
     top->read_command = 0;
 }
+
 int regfile_alu_test() {
     simReset();
 
+    // LDF 1 (carry flag)
+    selectRegisters(0, 0, R_F);
+    writeC(ALU::F_CARRY);
+
     // LDA 12
-    selectRegisters(R_GP1, R_GP2, R_GP1);
+    selectRegisters(0, 0, R_GP1);
     writeC(12);
 
     // LDB 25
-    selectRegisters(R_GP1, R_GP2, R_GP2);
+    selectRegisters(0, 0, R_GP2);
     writeC(25);
     
     // compute A + B
-    compute(ALU::OP_ADD, R_GP1, R_GP2, R_GP1);
+    compute(ALU::OP_ADC, R_GP1, R_GP2, R_GP1);
 
     std::cout << readA() << "\n";
     std::cout << readF() << "\n";

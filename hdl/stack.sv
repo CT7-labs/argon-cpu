@@ -5,8 +5,7 @@ module ArgonStack
 (
     input i_Clk,
     input i_Reset,
-    bus_if bus_if
-);
+    bus_if bus_if);
 
     logic [7:0] sp;
     word_t o_stack;

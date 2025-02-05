@@ -93,6 +93,8 @@ namespace STACK {
 
     const int COM_PUSH      = 0x1;
     const int COM_POP       = 0x2;
+    const int COM_LOAD_PTR  = 0x3;
+    const int COM_READ_PTR  = 0x3;
 }
 
 #endif
