@@ -1,7 +1,7 @@
 # Directory structure
 HDL_DIR = hdl
 SRC_DIR = testbench
-OBJ_DIR = obj_dir
+OBJ_DIR = build
 PKG_DIR = $(HDL_DIR)/pkg
 COMMON_DIR = $(HDL_DIR)/common
 TESTS_DIR = $(SRC_DIR)/tests
