@@ -65,7 +65,7 @@ void initTestbench(int argc, char** argv) {
     Verilated::traceEverOn(true);
     tfp = new VerilatedFstC;
     top->trace(tfp, 99);
-    tfp->open("wavedump.fst");
+    tfp->open("dump.fst");
 
     // put simulation in a known state
     clock_count = 0;

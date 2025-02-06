@@ -22,7 +22,9 @@ package regfile_pkg;
         COM_LATCHC   = 4'h3,  // Write to register C
         COM_LATCHSEL = 4'h4,  // Update register select values
         COM_READF    = 4'h5,  // Read flags register
-        COM_ALU_WE   = 4'h6   // ALU write enable
+        COM_ALU_WE   = 4'h6,  // ALU write enable
+        COM_SP_INC    = 4'h7,  // Increment stack pointer
+        COM_SP_DEC    = 4'h8   // Decrement stack pointer
     } command_t;
 
     // Register addresses

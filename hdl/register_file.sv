@@ -31,7 +31,10 @@ module ArgonRegFile (
     output word_t o_reg_b,
     output word_t o_reg_flags,
     input word_t i_write_data,
-    input write_sel_t i_write_select); // set to 0 to disable writing
+    input write_sel_t i_write_select, // set to 0 to disable writing
+    
+    // communication to Stack
+    output logic [7:0] o_reg_sp);
 
     // define registers
     word_t registers [1:REGISTERS-1];
@@ -41,6 +44,7 @@ module ArgonRegFile (
     assign o_reg_a     = registers[selA];
     assign o_reg_b     = registers[selB];
     assign o_reg_flags = registers[R_F];
+    assign o_reg_sp    = registers[R_SP][7:0];
 
     // handle outputs to Argon bus
     always_comb begin
@@ -76,6 +80,8 @@ module ArgonRegFile (
             for (int i = 1; i < REGISTERS; i++) begin
                 registers[i] <= 0;
             end
+
+            registers[R_SP] <= 16'h00FF; // for downward-growing stack
         end
 
         else begin
@@ -96,6 +102,14 @@ module ArgonRegFile (
             if (bus_if.command == COM_LATCHC && selC != 0) begin
                 if (bus_if.i_valid) registers[selC] <= bus_if.i_data;
                 else bus_if.error <= ERROR_INVALID_INPUT; 
+            end
+
+            if (bus_if.command == COM_SP_INC) begin
+               registers[R_SP][7:0] <= registers[R_SP][7:0] + 1;
+            end
+
+            else if (bus_if.command == COM_SP_DEC) begin
+               registers[R_SP][7:0] <= registers[R_SP][7:0] - 1;
             end
 
             // update selected registers with data from bus

@@ -123,6 +123,8 @@ module ArgonALU (
 
     always_comb begin
         // handle writing to RegFile
+        o_write_select = 0;
+        
         if (bus_if.command == COM_WRITEC) begin
             o_write_select = WSEL_REGC;
             o_write_data = extended_result[WORDSIZE-1:0];

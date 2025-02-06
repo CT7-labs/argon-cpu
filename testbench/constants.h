@@ -71,7 +71,8 @@ namespace REGFILE {
     const int COM_LATCHSEL  = 0x4;
     const int COM_READF     = 0x5;
     const int COM_ALU_WE    = 0x6;
-    const int COM_SP_WE     = 0x7;
+    const int COM_SP_INC    = 0x7;
+    const int COM_SP_DEC    = 0x8;
 
     // constants
     const int REGISTERS = 8;

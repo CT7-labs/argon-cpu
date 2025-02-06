@@ -53,6 +53,42 @@ void writeC(int value) {
     simClock();
 }
 
+void push(int reg) {
+    selectRegisters(reg, 0, 0);
+
+    // push
+    top->read_id = ID_STACK;
+    top->write_id = ID_REGFILE;
+    top->o_debug_valid = 0;
+
+    top->read_command = STACK::COM_PUSH;
+    top->write_command = REGFILE::COM_READA;
+    simClock();
+
+    // decrement SP
+    top->write_command = REGFILE::COM_SP_DEC;
+    top->read_command = 0;
+    simClock();
+}
+
+void pop(int reg) {
+    selectRegisters(0, 0, reg);
+
+    // pop
+    top->read_id = ID_REGFILE;
+    top->write_id = ID_STACK;
+    top->o_debug_valid = 0;
+
+    top->read_command = REGFILE::COM_LATCHC;
+    top->write_command = STACK::COM_POP;
+    simClock();
+
+    // increment SP
+    top->read_command = REGFILE::COM_SP_INC;
+    top->write_command = 0;
+    simClock();
+}
+
 void compute(int op, int a, int b, int c) {
     selectRegisters(a, b, c);
 
@@ -86,38 +122,8 @@ void compute(int op, int a, int b, int c) {
     top->read_command = REGFILE::COM_ALU_WE;
     top->write_command = ALU::COM_WRITEF;
     simClock();
-}
-
-void push(int reg_a) {
-    selectRegisters(reg_a, 0, 0);
-
-    // pass reg_a to stack
-    top->read_id = ID_STACK;
-    top->write_id = ID_REGFILE;
-    top->o_debug_valid = 0;
-
-    top->write_command = REGFILE::COM_READA;
-    top->read_command = STACK::COM_PUSH;
-
-    simClock();
-
-    top->write_command = 0;
     top->read_command = 0;
-}
-
-void pop(int reg_c) {
-    selectRegisters(0, 0, reg_c);
-
-    top->read_id = ID_REGFILE;
-    top->write_id = ID_STACK;
-
-    top->write_command = STACK::COM_POP;
-    top->read_command = REGFILE::COM_LATCHC;
-
-    simClock(2);
-
     top->write_command = 0;
-    top->read_command = 0;
 }
 
 int regfile_alu_test() {
@@ -140,6 +146,18 @@ int regfile_alu_test() {
 
     std::cout << readA() << "\n";
     std::cout << readF() << "\n";
+
+    // push to stack
+    push(R_GP1);
+    push(R_F);
+
+    // pop result into GP3
+    pop(R_GP3);
+    selectRegisters(R_GP3, 0, 0);
+    std::cout << "\n" << readA() << "\n";
+    pop(R_GP3);
+    selectRegisters(R_GP3, 0, 0);
+    std::cout << "\n" << readA() << "\n";
 
     simReset();
     return 0;

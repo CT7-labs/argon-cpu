@@ -152,12 +152,19 @@ module SimTop (
         .o_reg_b(reg_b),
         .o_reg_flags(reg_flags),
         .i_write_data(write_data),
-        .i_write_select(write_select)
-        );
+        .i_write_select(write_select),
+
+        // RegFile -> Stack port
+        .o_reg_sp(reg_sp));
+
+    logic [7:0] reg_sp;
 
     ArgonStack inst_ArgonStack (
         .i_Clk(i_Clk),
         .i_Reset(i_Reset),
-        .bus_if(stack_bus));
+        .bus_if(stack_bus),
+
+        // RegFile -> Stack port
+        .i_reg_sp(reg_sp));
 
 endmodule
