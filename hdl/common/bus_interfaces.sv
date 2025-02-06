@@ -18,4 +18,5 @@ interface bus_if;
     logic i_valid;
     logic o_valid;
     logic [3:0] command;
+    logic [3:0] error;
 endinterface

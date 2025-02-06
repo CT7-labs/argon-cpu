@@ -1,4 +1,5 @@
 import constants_pkg::*;
+import regfile_alu_shared_pkg::write_sel_t;
 
 module SimTop (
     input i_Clk,
@@ -124,12 +125,35 @@ module SimTop (
     ArgonALU inst_ArgonALU (
         .i_Clk(i_Clk),
         .i_Reset(i_Reset),
-        .bus_if(alu_bus));
+        .bus_if(alu_bus),
+        
+        // ALU <-> RegFile ports
+        .i_reg_a(reg_a),
+        .i_reg_b(reg_b),
+        .i_reg_flags(reg_flags),
+        .o_write_data(write_data),
+        .o_write_select(write_select)
+        );
+
+    // Intermediate wires for ALU<->RegFile connections
+    word_t reg_a;
+    word_t reg_b;
+    word_t reg_flags;
+    word_t write_data;
+    regfile_alu_shared_pkg::write_sel_t write_select;
 
     ArgonRegFile inst_ArgonRegFile (
         .i_Clk(i_Clk),
         .i_Reset(i_Reset),
-        .bus_if(regfile_bus));
+        .bus_if(regfile_bus),
+        
+        // RegFile <-> ALU ports
+        .o_reg_a(reg_a),
+        .o_reg_b(reg_b),
+        .o_reg_flags(reg_flags),
+        .i_write_data(write_data),
+        .i_write_select(write_select)
+        );
 
     ArgonStack inst_ArgonStack (
         .i_Clk(i_Clk),

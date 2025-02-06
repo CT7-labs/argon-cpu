@@ -13,13 +13,10 @@
 |   Usage   |
 +-----------+
 
-1. Load rA
-2. Load rB
-3. Load rOp
-4. Load rF (depending on operation)
-5. Latch internal result into rY and rF
-6. Output result
-7. Output flags
+0. Register file selects the correct A, B, and C registers
+1. Load rOp from bus
+2. Latch result into C register
+3. Latch result flags into F register
 
 +------------------------+
 |   Intended functions   |
@@ -89,84 +86,55 @@ Y = (A << WORDSIZE - B) | (A >> B)
 
 import constants_pkg::*;
 import alu_pkg::*;
+import regfile_alu_shared_pkg::*;
 
 module ArgonALU (
     // Interface signals
     input i_Clk,
     input i_Reset,
-    bus_if bus_if);
+    bus_if bus_if,
     
-    // registers
-    word_t rA, rB, rY;
-    logic [7:0] rF;
-    logic [3:0] rOp;
+    input word_t i_reg_a,
+    input word_t i_reg_b,
+    input word_t i_reg_flags,
+    output word_t o_write_data,
+    output write_sel_t o_write_select);
 
+    // registers / wires
+    logic [WORDSIZE:0] extended_rA = {1'b0, i_reg_a};
+    logic [WORDSIZE:0] extended_rB = {1'b0, i_reg_b};
+    logic [WORDSIZE:0] extended_result;
+    logic [7:0] result_flags;
+    logic [3:0] rOp;
 
     // handle clocked logic
     always_ff @(posedge i_Clk or posedge i_Reset) begin
 
         // reset logic
         if (i_Reset) begin
-            rA <= '0;
-            rB <= '0;
-            rF <= '0;
-            rY <= '0;
             rOp <= '0;
         end
 
         // command interpretation
-        else if (bus_if.command == COM_COMPUTE) begin
-            rY <= extended_result[WORDSIZE-1:0];
-            rF <= result_flags;
-        end
-
         else if (bus_if.i_valid) begin
-            case (bus_if.command)
-                COM_LATCHA:
-                    rA <= bus_if.i_data;
-                
-                COM_LATCHB:
-                    rB <= bus_if.i_data;
-                
-                COM_LATCHF:
-                    rF <= bus_if.i_data;
-                
-                COM_LATCHOP:
-                    rOp <= bus_if.i_data[3:0];
-                
-                default: begin
-                    // do nothing; don't write to internal registers
-                end
-            endcase
+            if (bus_if.command == COM_LATCHOP) rOp <= bus_if.i_data[3:0];
         end
     end
 
     always_comb begin
-        case (bus_if.command)
-            COM_OUTPUTY: begin
-                bus_if.o_data = rY; 
-                bus_if.o_valid = 1;
-            end
+        // handle writing to RegFile
+        if (bus_if.command == COM_WRITEC) begin
+            o_write_select = WSEL_REGC;
+            o_write_data = extended_result[WORDSIZE-1:0];
+        end
+        else if (bus_if.command == COM_WRITEF) begin
+            o_write_select = WSEL_REGF;
+            o_write_data = {i_reg_flags[WORDSIZE-1:8], result_flags[7:0]};
+        end
+        else o_write_select = '0;
 
-            COM_OUTPUTF: begin
-                bus_if.o_data = {{{WORDSIZE-8}{1'b0}}, rF};
-                bus_if.o_valid = 1;
-            end
+        // handle computing
 
-            default: begin
-                bus_if.o_data = '0;
-                bus_if.o_valid = 0;
-            end
-        endcase
-    end
-
-    // compute
-    logic [WORDSIZE:0] extended_rA = {1'b0, rA};
-    logic [WORDSIZE:0] extended_rB = {1'b0, rB};
-    logic [WORDSIZE:0] extended_result;
-    word_t result_flags;
-
-    always_comb begin
         result_flags = '0;
 
         case (rOp)
@@ -178,7 +146,7 @@ module ArgonALU (
             end
 
             ALU_ADC: begin
-                extended_result = extended_rA + extended_rB + rF[F_CARRY];
+                extended_result = extended_rA + extended_rB + i_reg_flags[F_CARRY];
 
                 result_flags[F_CARRY] = extended_result[WORDSIZE];
                 result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
@@ -192,14 +160,14 @@ module ArgonALU (
             end
 
             ALU_SBB: begin
-                extended_result = extended_rA - extended_rB - rF[F_BORROW];
+                extended_result = extended_rA - extended_rB - i_reg_flags[F_BORROW];
 
                 result_flags[F_BORROW] = extended_rA < extended_rB;
                 result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             ALU_CMP: begin
-                extended_result = {1'b0, rY}; // don't overwrite the Y register
+                extended_result = '0;
 
                 result_flags[F_EQUAL] = extended_rA == extended_rB;
                 result_flags[F_GREATER] = extended_rA > extended_rB;
@@ -232,14 +200,20 @@ module ArgonALU (
 
             ALU_OR: begin
                 extended_result = extended_rA | extended_rB;
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             ALU_NOR: begin
                 extended_result = ~(extended_rA | extended_rB);
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             ALU_XOR: begin
                 extended_result = extended_rA ^ extended_rB;
+
+                result_flags[F_ZERO] = (extended_result[WORDSIZE-1:0] == '0);
             end
 
             ALU_LSH: begin

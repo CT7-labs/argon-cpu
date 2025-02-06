@@ -2,7 +2,6 @@
 #define CONSTANTS_H
 
 const int WORDSIZE = 16;
-const int COMMAND_WIDTH = 4;
 
 // bus unit IDs
 const int ID_ALU        = 0x1;
@@ -11,15 +10,10 @@ const int ID_DEBUG      = 0x3;
 const int ID_STACK      = 0x4;
 
 namespace ALU {
-
     // commands
-    const int COM_LATCHA    = 0x1;
-    const int COM_LATCHB    = 0x2;
-    const int COM_LATCHF    = 0x3;
-    const int COM_LATCHOP   = 0x4;
-    const int COM_OUTPUTY   = 0x5;
-    const int COM_OUTPUTF   = 0x6;
-    const int COM_COMPUTE   = 0x7;
+    const int COM_LATCHOP  = 0x1;
+    const int COM_WRITEC   = 0x2;
+    const int COM_WRITEF   = 0x3;
 
     // opcodes
     const int OP_ADD   = 0x0;
@@ -75,27 +69,24 @@ namespace REGFILE {
     const int COM_READB     = 0x2;
     const int COM_LATCHC    = 0x3;
     const int COM_LATCHSEL  = 0x4;
-    const int COM_READSP    = 0x5;
-    const int COM_READF     = 0x6;
-    const int COM_READRV    = 0x7;
-    const int COM_LATCHSP   = 0x8;
-    const int COM_LATCHF    = 0x9;
-    const int COM_LATCHRV   = 0xA;
+    const int COM_READF     = 0x5;
+    const int COM_ALU_WE    = 0x6;
+    const int COM_SP_WE     = 0x7;
 
     // constants
     const int REGISTERS = 8;
     const int INDEX_WIDTH = 3;
-
-    // registers
-    const int R0    = 0;
-    const int R1    = 1;
-    const int R2    = 2;
-    const int R3    = 3;
-    const int R4    = 4;
-    const int RV    = 5;
-    const int SP    = 7;
-    const int F     = 6;
 }
+
+// registers
+const int R_ZERO    = 0;
+const int R_GP1     = 1;
+const int R_GP2     = 2;
+const int R_GP3     = 3;
+const int R_GP4     = 4;
+const int R_GP5     = 5;
+const int R_SP      = 6;
+const int R_F       = 7;
 
 namespace STACK {
     // commands
@@ -103,7 +94,7 @@ namespace STACK {
     const int COM_PUSH      = 0x1;
     const int COM_POP       = 0x2;
     const int COM_LOAD_PTR  = 0x3;
-    const int COM_READ_PTR  = 0x4;
+    const int COM_READ_PTR  = 0x3;
 }
 
 #endif

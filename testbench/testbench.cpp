@@ -85,7 +85,7 @@ void runTest() {
     // Start timing
     auto start = high_resolution_clock::now();
     
-    int return_code = regfiletest();
+    int return_code = regfile_alu_test();
     
     // End timing
     auto end = high_resolution_clock::now();

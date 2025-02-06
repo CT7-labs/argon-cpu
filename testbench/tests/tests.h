@@ -8,9 +8,6 @@ extern VSimTop* top;
 extern VerilatedFstC* tfp;
 
 // test functions
-int alutest();
-int stacktest();
-int regfiletest();
-int regfile_alu();
+int regfile_alu_test();
 
 #endif
