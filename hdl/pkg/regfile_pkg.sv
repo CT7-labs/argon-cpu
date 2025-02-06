@@ -18,6 +18,17 @@ package regfile_pkg;
     parameter SP    = 7;
     parameter F     = 6;
 
+    typedef enum logic [3:0] {
+        COM_READA       = 1,
+        COM_READB       = 2,
+        COM_LATCHC      = 3,
+        COM_LATCHSEL    = 4,
+        COM_READF       = 5,
+        COM_ALU_WE      = 6,
+        COM_SP_WE       = 7
+    } reg_com_t;
+
+
     // Register addresses
     typedef enum logic [INDEX_WIDTH-1:0] {
         R_ZERO = 3'b000,  // Zero register
