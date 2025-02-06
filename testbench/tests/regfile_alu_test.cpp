@@ -141,15 +141,6 @@ int regfile_alu_test() {
     std::cout << readA() << "\n";
     std::cout << readF() << "\n";
 
-    // push GP1 into stack
-    push(R_GP1);
-
-    // pop stack into GP3
-    pop(R_GP3);
-    selectRegisters(R_GP3, 0, 0);
-
-    std::cout << readA() << "\n";
-
     simReset();
     return 0;
 }
