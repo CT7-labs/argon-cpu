@@ -7,12 +7,12 @@ This is a work in progress!
 ## Units on the internal bus
  - [x] ALU
  - [x] Register File
- - [ ] Control Unit
- - [ ] Memory Controller
  - [X] Stack
+ - [ ] Memory Controller
  - [ ] Program Counter
+ - [ ] Control Unit
  - [ ] Interrupt Handler
- - [ ] Device Controller (communicates with devices on external bus)
+ - [ ] Device Controller (communicates with devices on external buses like SPI, PS/2, etc.)
 
 ## Near-future Plans
 - [ ] Verilator emulator (not super fast, but cycle-accurate!)
