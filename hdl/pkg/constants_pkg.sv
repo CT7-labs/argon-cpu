@@ -13,7 +13,8 @@ package constants_pkg;
         ID_ALU     = 4'h1,
         ID_REGFILE = 4'h2,
         ID_DEBUG   = 4'h3,
-        ID_STACK   = 4'h4
+        ID_STACK   = 4'h4,
+        ID_MEM     = 4'h5
     } unit_id_t;
 
     // Error codes

@@ -15,7 +15,8 @@ module SimTop (
     input [3:0] write_id,
     input [3:0] read_id,
     input [3:0] write_command,
-    input [3:0] read_command);
+    input [3:0] read_command,
+    output [3:0] memcontroller_status);
 
     // bus interfaces
     master_bus_if master_bus();
@@ -27,6 +28,7 @@ module SimTop (
     bus_if alu_bus();
     bus_if regfile_bus();
     bus_if stack_bus();
+    bus_if mem_bus();
     
     bus_if debug_bus();
     assign i_debug = debug_bus.i_data;
@@ -78,10 +80,20 @@ module SimTop (
                 end
             end
 
+            ID_MEM: begin
+                if (mem_bus.o_valid) begin
+                    master_bus.o_data = mem_bus.o_data;
+                    master_bus.o_valid = mem_bus.o_valid;
+                end
+
+                mem_bus.command = write_command;
+            end
+
             default: begin
                 alu_bus.command = 0;
                 regfile_bus.command = 0;
                 stack_bus.command = 0;
+                mem_bus.command = 0;
             end 
         endcase
 
@@ -110,6 +122,12 @@ module SimTop (
                 debug_bus.i_valid = master_bus.o_valid;
             end
 
+            ID_MEM: begin
+                mem_bus.i_data = master_bus.o_data;
+                mem_bus.i_valid = master_bus.o_valid;
+                mem_bus.command = master_bus.read_command;
+            end
+
             default: begin
                 master_bus.i_data = '0;
                 master_bus.i_valid = 0;
@@ -117,6 +135,7 @@ module SimTop (
                 alu_bus.command = 0;
                 regfile_bus.command = 0;
                 stack_bus.command = 0;
+                mem_bus.command = 0;
             end
         endcase
     end
@@ -166,5 +185,15 @@ module SimTop (
 
         // RegFile -> Stack port
         .i_reg_sp(reg_sp));
+    
+    memcontroller_pkg::status_t mem_stats;
+
+    ArgonMemController inst_ArgonMemController (
+        .i_Clk(i_Clk),
+        .i_Reset(i_Reset),
+        .bus_if(mem_bus),
+
+        // memcontroller -> control unit
+        .o_status(mem_status));
 
 endmodule

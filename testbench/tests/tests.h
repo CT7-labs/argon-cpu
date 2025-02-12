@@ -19,5 +19,6 @@ void compute(int op, int a, int b, int c);
 
 // test functions
 int regfile_alu_test();
+int memcontroller_test();
 
 #endif

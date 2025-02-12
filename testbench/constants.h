@@ -8,6 +8,7 @@ const int ID_ALU        = 0x1;
 const int ID_REGFILE    = 0x2;
 const int ID_DEBUG      = 0x3;
 const int ID_STACK      = 0x4;
+const int ID_MEM        = 0x5;
 
 namespace ALU {
     // commands
@@ -91,11 +92,24 @@ const int R_F       = 7;
 
 namespace STACK {
     // commands
-
     const int COM_PUSH      = 0x1;
     const int COM_POP       = 0x2;
     const int COM_LOAD_PTR  = 0x3;
     const int COM_READ_PTR  = 0x3;
+}
+
+namespace MEM {
+    // commands
+    const int COM_NOP       = 0x0;
+    const int COM_LATCH_MP  = 0x1;
+    const int COM_READ      = 0x2;
+    const int COM_WRITE     = 0x3;
+    const int COM_TEMP_OUT  = 0x4;
+
+    // statuses
+    const int ST_READY      = 0x0;
+    const int ST_BUSY_READ  = 0x1;
+    const int ST_BUSY_WRITE = 0x2;
 }
 
 #endif
