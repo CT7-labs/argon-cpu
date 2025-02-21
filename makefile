@@ -7,9 +7,9 @@ COMMON_DIR = $(HDL_DIR)/common
 TESTS_DIR = $(SRC_DIR)/tests
 
 # Find SystemVerilog files
-PKG_FILES := $(wildcard $(PKG_DIR)/*.sv)
-COMMON_FILES := $(wildcard $(COMMON_DIR)/*.sv)
-VERILOG_FILES := $(wildcard $(HDL_DIR)/*.sv)
+PKG_FILES := $(wildcard $(PKG_DIR)/*.v)
+COMMON_FILES := $(wildcard $(COMMON_DIR)/*.v)
+VERILOG_FILES := $(wildcard $(HDL_DIR)/*.v)
 
 # top module name
 TOP_MODULE = SimTop
