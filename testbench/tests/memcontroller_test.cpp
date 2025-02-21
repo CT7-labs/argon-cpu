@@ -14,6 +14,10 @@ void memWriteDebug(int addr, int imm16) {
     top->read_command = MEM::COM_WRITE;
     top->o_debug = imm16;
     simClock();
+
+    while (top->o_mem_status != MEM::ST_READY) {
+        simClock();
+    }
 }
 
 int memReadDebug(int addr) {
@@ -36,7 +40,9 @@ int memReadDebug(int addr) {
 
     // read temp
     top->write_command = MEM::COM_TEMP_OUT;
-    simClock();
+    while (top->o_mem_status != MEM::ST_READY) {
+        simClock();
+    }
 
     return top->i_debug; // return temp
 }
@@ -45,9 +51,14 @@ int memcontroller_test() {
     simReset();
 
     memWriteDebug(0, 16);
-    int test = memReadDebug(0);
+    int test0 = memReadDebug(0);
+    memWriteDebug(1, 32);
+    int test1 = memReadDebug(1);
+    memWriteDebug(2, 8);
+    int test2 = memReadDebug(3);
 
+    std::cout << test0 << " " << test1 << " " << test2 << "\n";
     simReset();
 
-    return test;
+    return 0;
 }
