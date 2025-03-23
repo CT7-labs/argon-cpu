@@ -1,71 +1,32 @@
-# Directory structure
-HDL_DIR = hdl
-SRC_DIR = testbench
-OBJ_DIR = build
-PKG_DIR = $(HDL_DIR)/pkg
-COMMON_DIR = $(HDL_DIR)/common
-TESTS_DIR = $(SRC_DIR)/tests
-
-# Find SystemVerilog files
-PKG_FILES := $(wildcard $(PKG_DIR)/*.v)
-COMMON_FILES := $(wildcard $(COMMON_DIR)/*.v)
-VERILOG_FILES := $(wildcard $(HDL_DIR)/*.v)
-
-# top module name
+# Makefile for Verilating and running simulations to assist Argon's development
+RTL_DIR = rtl
 TOP_MODULE = SimTop
+SIM_DIR = obj_dir
+OBJ_NAME = VSimTop
+SIM_OBJ = $(SIM_DIR)/$(OBJ_NAME)
 
-# C++ source in src directory
-SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
-TEST_FILES = $(wildcard $(TESTS_DIR)/*.cpp)
-CPP_SRC = $(SRC_FILES) $(TEST_FILES)
+VERILATOR = verilator
+VERILATOR_FLAGS = -Wno-fatal --cc --exe --build -o $(OBJ_NAME)
 
-# Executable name
-EXECUTABLE = $(OBJ_DIR)/V$(TOP_MODULE)
-EXECUTABLE_FLAGS = --fromMake
+# Source files
+VERILOG_FILES = $(wildcard $(RTL_DIR)/*.sv)
+CPP_FILES = testbench.cpp
 
-# Verilator flags
-VERILATOR_FLAGS = --cc --exe --build -j -Wno-fatal --trace-fst -I$(HDL_DIR)
+# Default target: Verilate but don't run
+.PHONY: all clean run
+default: $(SIM_OBJ)
 
-# Make sure the obj directory exists
-$(shell mkdir -p $(OBJ_DIR))
-$(shell mkdir -p $(HDL_DIR))
-$(shell mkdir -p $(SRC_DIR))
-$(shell mkdir -p $(TESTS_DIR))
-
-# Default target is just build
-.DEFAULT_GOAL := build
-
-# All target does everything
-all: clean build run
-
-# Build target
-build: $(EXECUTABLE)
-
-# Verilate and build
-$(EXECUTABLE): $(PKG_FILES) $(COMMON_FILES) $(VERILOG_FILES) $(CPP_SRC)
-	@echo "Building $(EXECUTABLE)..."
-	verilator $(VERILATOR_FLAGS) \
-		-CFLAGS "-std=c++11" \
-		--top-module $(TOP_MODULE) \
-		--Mdir $(OBJ_DIR) \
-		$^
-	@if [ ! -f $(EXECUTABLE) ]; then \
-		echo "Error: Build failed - executable not created"; \
-		exit 1; \
-	fi
+# Verilate the design
+$(SIM_OBJ): $(VERILOG_FILES) $(CPP_FILES)
+	$(VERILATOR) $(VERILATOR_FLAGS) -I$(RTL_DIR) --top-module $(TOP_MODULE) $(VERILOG_FILES) $(CPP_FILES) --Mdir $(SIM_DIR)
 
 # Run the simulation
-run: $(EXECUTABLE)
-	@if [ ! -x $(EXECUTABLE) ]; then \
-		echo "Error: $(EXECUTABLE) not found or not executable"; \
-		exit 1; \
-	fi
+run: $(SIM_OBJ)
+	./$(SIM_OBJ)
 
-	$(EXECUTABLE) $(EXECUTABLE_FLAGS)
-
-# Clean output files
+# Clean up generated files
 clean:
-	rm -rf $(OBJ_DIR)
-	rm -f *.fst
+	rm -rf $(SIM_DIR)
 
-.PHONY: all clean run build
+# All: Clean, verilate, and run
+all: clean $(SIM_OBJ) run

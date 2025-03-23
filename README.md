@@ -4,7 +4,7 @@
 ## Features
 - Hardware user stack/call stack
 - 8x registers (with zero registers)
-- Up to 32 instructions (5-bit opcode)
+- Up to 64 instructions (6-bit opcode)
 - PC is not directly program-accessible
 - 16-bit address space (Theoretically 24-bit with memory banking)
 - Strictly unsigned operations
@@ -49,6 +49,24 @@ ALU flags register
 1 -> Zero
 0 -> Carry
 
+# Memory
+## Overview
+Argon sports a 24-bit memory space. It expects a 16-bit word at each address, so you have a theoretical maximum memory of 32MB.
+
+The 24-bit memory space is split into two 23-bit wide banks. The lower bank is external HyperRAM, and the upper bank is reserved.
+
+The upper 64K of the reserved bank is used for scratchpad RAM, MMIO, and registers.
+
+The 16MB of HyperRAM in the physical implementation of Argon are shared with Krypton. They take turns reading/writing.
+
+## Memory-mapped registers
+### Interrupt control
+### Hardware timer control
+### Graphics control (direct access to Krypton registers)
+Krypton (a custom graphics chip) is Argon's partner in crime. Argon supplies pixel data while Krypton displays the image.
+
+Krypton is fairly weak, but will support tiles, sprites, and bitmap graphics.
+
 # ISA
 RS1 -> register source 1
 RS1 -> register source 2
@@ -59,8 +77,8 @@ SP  -> stack pointer
 CSP -> call stack pointer
 
 ## Instruction format
-Instructions are 32-bit words, containing a 6-bit opcode, 3x 3-bit register indices (source 1, source 2, destination), a RFU bit, and a 16-bit immediate value
-OOOOOORR-RSSSDDDF-IIIIIIII-IIIIIIII
+Instructions are 16/32-bit words, containing a 6-bit opcode, 3x 3-bit register indices (source 1, source 2, destination), a RFU bit, and an optional 16-bit immediate value.
+OOOOOORR-RSSSDDDF IIIIIIII-IIIIIIII
 
 O -> opcode bit
 R -> RS1 bit
@@ -84,7 +102,7 @@ RD = RS1 - RS2 - BF
 RD = 0
 F = RS1 CMP RS2
 
-### INC RS1, RS2, RD
+### INC RS1, RD
 RD = RS1 + 1
 
 ### DEC RS1, RS2, RD
