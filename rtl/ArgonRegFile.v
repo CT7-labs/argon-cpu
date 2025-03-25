@@ -17,9 +17,9 @@ module ArgonRegFile #(parameter REGISTERS = 8, INDEXWIDTH = 3, DATAWIDTH=16) (
     input wire [INDEXWIDTH-1:0] i_selectW,
 
     // Data wires
-    input wire [DATAWIDTH-1:0] i_wdata,
-    output wire [DATAWIDTH-1:0] o_rdataA,
-    output wire [DATAWIDTH-1:0] o_rdataB
+    input reg [DATAWIDTH-1:0] i_wdata,
+    output reg [DATAWIDTH-1:0] o_rdataA,
+    output reg [DATAWIDTH-1:0] o_rdataB
 );
 
     reg [DATAWIDTH-1:0] regfile [1:REGISTERS-1];
