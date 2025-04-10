@@ -29,13 +29,13 @@ module Argon (
     wire sys_clk;
     assign sys_clk = (i_clk & ~i_halt);
 
-    wire [15:0] w_operandB;
+    wire [15:0] w_alu_operandB;
     wire [15:0] w_alu_result;
-    wire [15:0] w_register_writeback;
 
-    assign w_register_writeback = (i_write_to_regfile) ? i_portW : w_alu_result;
+    assign w_registers_writeback = (i_write_to_regfile) ? i_portW : w_alu_result;
     assign w_operandB = (i_use_immediate) ? i_portW : o_portB;
 
+    wire [15:0] w_registers_portA, w_registers_portB, w_registers_writeback;
     Registers inst_argon_registers (
         .i_clk(sys_clk),
         .i_reset(i_reset),
@@ -47,14 +47,14 @@ module Argon (
 
         .o_portA(o_portA),
         .o_portB(o_portB),
-        .i_portW(w_register_writeback)
+        .i_portW(w_registers_writeback)
     );
 
     ALU inst_argon_alu (
         .i_opcode(i_alu_op),
 
-        .i_wordA(o_portA),
-        .i_wordB(w_operandB),
+        .i_wordA(w_registers_portA),
+        .i_wordB(w_alu_operandB),
         .o_result(w_alu_result),
 
         .o_flag_zero(o_flag_zero),
