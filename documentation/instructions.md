@@ -20,6 +20,7 @@ These are the instructions usable by the programmmer.
 - ANDI rd, rs1, imm8
 - ORI  rd, rs1, imm8
 - XORI rd, rs1, imm8
+
 *Note, these immediates can be treated as signed/unsigned*
 
 - SLT rd, rs1, rs2
@@ -27,12 +28,14 @@ These are the instructions usable by the programmmer.
 - SLL rd, rs1, rs2
 - SRL rd, rs1, rs2
 - SRA rd, rs1, rs2
+- SEP rd, rs1
 
 - SLTI rd, rs1, imm8
 - SLTIU rd, rs1, imm8
 - SLLI rd, rs1, imm8
 - SRLI rd, rs1, imm8
 - SRAI rd, rs1, imm8
+
 *Note, these immediates are all unsigned*
 
 ## Branching
@@ -56,4 +59,3 @@ off16 -> signed 16-bit offset
 - MOV rd, rs1
 - CALL rd, subroutine
 - RET rd, subroutine
-- 

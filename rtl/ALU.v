@@ -11,6 +11,7 @@ localparam OP_SRL    = 4'h6;    // Shift Right Logical
 localparam OP_SRA    = 4'h7;    // Shift Right Arithmetic
 localparam OP_SLT    = 4'h8;    // Set Less Than (signed)
 localparam OP_SLTU   = 4'h9;    // Set Less Than (unsigned)
+localparam OP_SEP   = 4'hA;     // Set even parity
 
 module ALU (
     // control port (yeah pretty simple here)
@@ -40,6 +41,7 @@ module ALU (
             OP_SRA:  o_result = $signed(i_wordA) >>> i_wordB[3:0]; // Shift Right Arithmetic
             OP_SLT:  o_result = ($signed(i_wordA) < $signed(i_wordB)) ? 16'h1 : 16'h0; // Signed Less Than
             OP_SLTU: o_result = (i_wordA < i_wordB) ? 16'h1 : 16'h0; // Unsigned Less Than
+            OP_SEP: o_result = ^i_wordA;                           // Set even parity
             default: o_result = 16'h0;                            // Default: output 0
         endcase
     end
