@@ -6,7 +6,5 @@ Custom CPU with heavy inspiration drawn from RISC-V to be implemented on an iCE4
 - 16x registers
 - 32-bit fixed-width instructions
 - Simple interrupt support
-- 16-bit data width
-- 
 
 Check out `documentation/` for more info on individual components within the CPU
