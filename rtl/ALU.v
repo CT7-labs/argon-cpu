@@ -15,6 +15,7 @@ localparam OP_SEP   = 4'hA;     // Set even parity
 
 module ALU (
     // control port (yeah pretty simple here)
+    input wire i_clk,
     input wire [3:0] i_opcode,
 
     // data ports
@@ -29,20 +30,20 @@ module ALU (
     output wire o_flag_carry
 );
 
-    always @(*) begin
+    always @(posedge i_clk) begin
         case (i_opcode)
-            OP_ADD:  o_result = i_wordA + i_wordB;                // Addition
-            OP_SUB:  o_result = i_wordA - i_wordB;                // Subtraction
-            OP_AND:  o_result = i_wordA & i_wordB;                // Bitwise AND
-            OP_OR:   o_result = i_wordA | i_wordB;                // Bitwise OR
-            OP_XOR:  o_result = i_wordA ^ i_wordB;                // Bitwise XOR
-            OP_SLL:  o_result = i_wordA << i_wordB[3:0];          // Shift Left Logical
-            OP_SRL:  o_result = i_wordA >> i_wordB[3:0];          // Shift Right Logical
-            OP_SRA:  o_result = $signed(i_wordA) >>> i_wordB[3:0]; // Shift Right Arithmetic
-            OP_SLT:  o_result = ($signed(i_wordA) < $signed(i_wordB)) ? 16'h1 : 16'h0; // Signed Less Than
-            OP_SLTU: o_result = (i_wordA < i_wordB) ? 16'h1 : 16'h0; // Unsigned Less Than
-            OP_SEP: o_result = ^i_wordA;                           // Set even parity
-            default: o_result = 16'h0;                            // Default: output 0
+            OP_ADD:  o_result <= i_wordA + i_wordB;                // Addition
+            OP_SUB:  o_result <= i_wordA - i_wordB;                // Subtraction
+            OP_AND:  o_result <= i_wordA & i_wordB;                // Bitwise AND
+            OP_OR:   o_result <= i_wordA | i_wordB;                // Bitwise OR
+            OP_XOR:  o_result <= i_wordA ^ i_wordB;                // Bitwise XOR
+            OP_SLL:  o_result <= i_wordA << i_wordB[3:0];          // Shift Left Logical
+            OP_SRL:  o_result <= i_wordA >> i_wordB[3:0];          // Shift Right Logical
+            OP_SRA:  o_result <= $signed(i_wordA) >>> i_wordB[3:0]; // Shift Right Arithmetic
+            OP_SLT:  o_result <= ($signed(i_wordA) < $signed(i_wordB)) ? 16'h1 : 16'h0; // Signed Less Than
+            OP_SLTU: o_result <= (i_wordA < i_wordB) ? 16'h1 : 16'h0; // Unsigned Less Than
+            OP_SEP:  o_result <= ^i_wordA;                           // Set even parity
+            default: o_result <= 16'h0;                            // Default: output 0
         endcase
     end
 
