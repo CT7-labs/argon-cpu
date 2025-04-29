@@ -9,6 +9,8 @@ TRACE_FILE = dump.fst
 VERILATOR = verilator
 VERILATOR_FLAGS = -Wno-fatal --cc --exe --build -o $(OBJ_NAME) --trace-fst
 
+# this is a test
+
 # Source files
 VERILOG_FILES = $(wildcard $(RTL_DIR)/*.v)
 CPP_FILES = testbench.cpp
