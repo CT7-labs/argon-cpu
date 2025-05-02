@@ -1,12 +1,12 @@
-localparam BEQ      = 6'h0;
-localparam BNE      = 6'h1;
-localparam BGE      = 6'h2;
-localparam BGEU     = 6'h3;
-localparam BLT      = 6'h4;
-localparam BLTU     = 6'h5;
+localparam BEQ      = 3'h0;
+localparam BNE      = 3'h1;
+localparam BGE      = 3'h2;
+localparam BGEU     = 3'h3;
+localparam BLT      = 3'h4;
+localparam BLTU     = 3'h5;
 
 module BranchManager (
-    input wire [5:0] i_branch_type,
+    input wire [2:0] i_branch_type,
     input wire i_flag_zero,
     input wire i_flag_sign,
     input wire i_flag_overflow,

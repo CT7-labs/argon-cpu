@@ -7,6 +7,7 @@ These are the instructions usable by the programmmer.
 - LW rs1, rs2 (16-bit)
 - SB rs1, rs2 (8-bit)
 - SW rs1, rs2 (16-bit)
+- LI rd, imm16
 
 ## ALU Operations
 - ADD rd, rs1, rs2
@@ -15,11 +16,11 @@ These are the instructions usable by the programmmer.
 - OR  rd, rs1, rs2
 - XOR rd, rs1, rs2
 
-- ADDI rd, rs1, imm8
-- SUBI rd, rs1, imm8
-- ANDI rd, rs1, imm8
-- ORI  rd, rs1, imm8
-- XORI rd, rs1, imm8
+- ADDI rd, rs1, imm16
+- SUBI rd, rs1, imm16
+- ANDI rd, rs1, imm16
+- ORI  rd, rs1, imm16
+- XORI rd, rs1, imm16
 
 *Note, these immediates can be treated as signed/unsigned*
 
@@ -30,11 +31,11 @@ These are the instructions usable by the programmmer.
 - SRA rd, rs1, rs2
 - SEP rd, rs1
 
-- SLTI rd, rs1, imm8
-- SLTIU rd, rs1, imm8
-- SLLI rd, rs1, imm8
-- SRLI rd, rs1, imm8
-- SRAI rd, rs1, imm8
+- SLTI rd, rs1, imm16
+- SLTIU rd, rs1, imm16
+- SLLI rd, rs1, imm16
+- SRLI rd, rs1, imm16
+- SRAI rd, rs1, imm16
 
 *Note, these immediates are all unsigned*
 
