@@ -1,5 +1,6 @@
-# Argon Architecture
+# Argon Architecture Overview
 - RISC ISA
+- Little-Endian
 - 32-bit data width
 - 32-bit fixed-width instructions
 - I-type, R-type, and J-type instructions (inspired by MIPS)
@@ -8,7 +9,12 @@
 
 Argon will be implemented on an iCE40HX8K that has quite a few pins
 broken out to pin headers and peripherals (PMOD, SD card in SPI mode, GPIO, etc.)
-so I'm dedicating a few registers to I/O instead of writing a fancy MMU in Verilog.
+so I'm dedicating a few registers to I/O instead of writing a fancy MMU in Verilog. The mmu will still have to handle writing to Krypton
+and other things like the UART master and timer, but that's alright.
+
+# Memory
+Addressed with 32-bit words, but the CPU can request half-words or
+bytes from the MMU too.
 
 # Instruction types
 ### I-type
@@ -30,34 +36,36 @@ so I'm dedicating a few registers to I/O instead of writing a fancy MMU in Veril
 26-bit offset (instructions, not bytes)
 
 # Register file
-### r0
+### r0 (zero)
 Read-only zero
 
-### r1-11
-General purpose registers (caller)
+### r1-4 (a0-3)
+Function arguments (caller)
 
-### r12-22
-General purpose registers (callee)
+### r5-6 (r0-1)
+Return values (callee)
+
+### r7-r14 (s0-7)
+General purpose saved registers (caller)
+
+### r15-22 (t0-7)
+General purpose temporary registers (callee)
 
 ### r23-27
-Special registers that should only be written to by the caller
-- Global pointer
-- Stack pointer
-- Status register
-- Interrupt status
-- Return address
-
-Note, for interrupt status, only the first 16 pins in PORTA are available for custom interrupts.
-Another 8 bits are reserved for internal interrupts (UART master, Krypton graphics chip, etc.),
-and the final 8 bits are control bits (global interrupt enable, etc.)
+Special registers
+- Global pointer (gp)
+- Stack pointer (sp)
+- Status register (st)
+- Interrupt status (is)
+- Return address (ra)
 
 ### r28-31
 I/O registers (map to 64 pins with direction control)
 
-PORTA
-DDIRA
-PORTB
-DDIRB
+porta
+ddira
+portb
+ddirb
 
 *technically* it's "6" registers, but the programmmer sees 4 because the "read only" and "write only" registers are merged.
 Reading from the PORTA register returns the value from the "read only" register, and writing to the PORTA register sets
@@ -80,11 +88,9 @@ the value in "write only" register.
 - NORI rd, rs, imm16
 - XORI rd, rs, imm16
 
-### ALU bitwise
+### ALU bit operations
 - SETB rd, shamt
 - CLRB rd, shamt
-- READB rd, rs, shamt
-- SETBR rd, rs, shamt
 
 ### ALU shifting
 - SLL rd, rs, rs
@@ -100,15 +106,15 @@ the value in "write only" register.
 - SLT rd, rs, rt
 - SLTU rd, rs, rt
 - JMP offset26
-- JAL rd, offset26
-- JALR rd, rs
 - JMPR rs
+- JAL offset26
+- JALR rd, rs
 
 ### Memory operations
 - LUI rd, imm16
-- LW rd, rs
-- LH rd, rs
-- LB rd, rs
-- SW rs, rt
-- SH rs, rt
-- SB rs, rt
+- LW rd, rs, offset16
+- LH rd, rs, offset16
+- LB rd, rs, offset16
+- SW rs, rt, offset16
+- SH rs, rt, offset16
+- SB rs, rt, offset16
