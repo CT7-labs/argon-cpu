@@ -42,7 +42,7 @@ Read-only zero
 ### r1-4 (a0-3)
 Function arguments (caller)
 
-### r5-6 (r0-1)
+### r5-6 (v0-1)
 Return values (callee)
 
 ### r7-r14 (s0-7)
@@ -105,9 +105,9 @@ the value in "write only" register.
 - BNE rs, rt, offset16
 - SLT rd, rs, rt
 - SLTU rd, rs, rt
-- JMP offset26
+- JMP jtarg26
 - JMPR rs
-- JAL offset26
+- JAL jtarg26
 - JALR rd, rs
 
 ### Memory operations
