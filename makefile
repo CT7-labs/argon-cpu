@@ -12,7 +12,7 @@ VERILATOR_FLAGS = -Wno-fatal --cc --exe --build -o $(OBJ_NAME) --trace-fst
 # this is a test
 
 # Source files
-VERILOG_FILES = $(wildcard $(RTL_DIR)/*.v)
+VERILOG_FILES = $(wildcard $(RTL_DIR)/*.sv)
 CPP_FILES = testbench.cpp
 
 # Default target: Verilate but don't run
@@ -25,7 +25,7 @@ $(SIM_OBJ): $(VERILOG_FILES) $(CPP_FILES)
 
 # Run the simulation and generate waveform
 run: $(SIM_OBJ)
-	./$(SIM_OBJ)
+	$(SIM_DIR)/$(OBJ_NAME)
 	@echo "Waveform dumped to $(TRACE_FILE)"
 
 # Clean up generated files, including trace file
