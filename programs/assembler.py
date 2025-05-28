@@ -175,27 +175,38 @@ def replace_constants(tokenized_lines, constants):
     return tokenized_lines
 
 def tokenize_expression(expression):
-    # assumes expression is not malformed and stripped of spaces
+    # Assumes expression is stripped of spaces
     tokens = []
-
-    token = ""
-    index = 0
-    for c in expression:
-        token += c
-
-        if token in expression_operators:
-            tokens.append(token)
+    expression_operators = ["+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "~", "<", ">", "==", "!=", "(", ")"]
+    
+    i = 0
+    while i < len(expression):
+        # Try to match the longest operator starting at i
+        matched_operator = None
+        for op in sorted(expression_operators, key=len, reverse=True):  # Longest first
+            if expression.startswith(op, i):
+                matched_operator = op
+                break
+        
+        if matched_operator:
+            tokens.append(matched_operator)
+            i += len(matched_operator)
+            continue
+        
+        # Accumulate alphanumeric or underscore for variable/number
+        if expression[i].isalnum() or expression[i] == "_":
             token = ""
-        elif c.isalnum() != expression[index + 1].isalnum():
-            integer_token = immediate_to_int(token)
-
-            if integer_token:
-                tokens.append(integer_token)
-            else:
-                tokens.append(token)
-            token = ""
-
-        index += 1
+            while i < len(expression) and (expression[i].isalnum() or expression[i] == "_"):
+                token += expression[i]
+                i += 1
+            # Try to convert to integer (handles decimal, hex like 0x4)
+            try:
+                tokens.append(int(token, 0))  # Base 0 handles 0x, 0b, etc.
+            except ValueError:
+                tokens.append(token)  # Variable name
+            continue
+        
+        raise ValueError(f"Invalid character in expression: {expression[i]}")
     
     return tokens
 
@@ -250,10 +261,10 @@ def compute(operator, operand1, operand2):
 def evaluate_expression(expression, constants):
     operands = []
     operators = []
+    expression_operators = ["+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "~", "<", ">", "==", "!=", "(", ")"]
     
-    # order expression
     for token in expression:
-        if type(token) == int:
+        if isinstance(token, int):
             operands.append(token)
         elif token in constants:
             operands.append(constants[token])
@@ -262,19 +273,23 @@ def evaluate_expression(expression, constants):
         elif token == ")":
             while len(operators) != 0 and operators[-1] != "(":
                 operator = operators.pop()
-
+                if operator not in expression_operators:
+                    raise ValueError(f"Invalid operator on stack: {operator}")
                 if operator != "~":
+                    if len(operands) < 2:
+                        raise ValueError("Not enough operands for binary operator")
                     operand2 = operands.pop()
                     operand1 = operands.pop()
-                    result = compute(operator, operand1, operand2)
                 else:
+                    if len(operands) < 1:
+                        raise ValueError("Not enough operands for unary operator")
                     operand2 = operands.pop()
-                    operand1 = 0 # don't care
-                    result = compute(operator, operand1, operand2)
-                
+                    operand1 = 0  # Don't care
+                result = compute(operator, operand1, operand2)
                 operands.append(result)
-            
-            operators.pop() # discard (
+            if len(operators) == 0:
+                raise ValueError("Mismatched parentheses")
+            operators.pop()  # Discard (
         elif token in expression_operators:
             thisOp = token
             while (len(operators) != 0 and operators[-1] != "(" and 
@@ -283,33 +298,39 @@ def evaluate_expression(expression, constants):
                 if operator not in expression_operators:
                     raise ValueError(f"Invalid operator on stack: {operator}")
                 if operator != "~":
+                    if len(operands) < 2:
+                        raise ValueError("Not enough operands for binary operator")
                     operand2 = operands.pop()
                     operand1 = operands.pop()
                 else:
+                    if len(operands) < 1:
+                        raise ValueError("Not enough operands for unary operator")
                     operand2 = operands.pop()
                     operand1 = 0  # Don't care
                 result = compute(operator, operand1, operand2)
                 operands.append(result)
             operators.append(thisOp)
-            
-            operators.append(thisOp)
     
-    # compute result
     while len(operators) != 0:
         operator = operators.pop()
-        operand2 = operands.pop()
+        if operator not in expression_operators:
+            raise ValueError(f"Invalid operator on stack: {operator}")
         if operator != "~":
+            if len(operands) < 2:
+                raise ValueError("Not enough operands for binary operator")
+            operand2 = operands.pop()
             operand1 = operands.pop()
         else:
+            if len(operands) < 1:
+                raise ValueError("Not enough operands for unary operator")
+            operand2 = operands.pop()
             operand1 = 0
-        
         result = compute(operator, operand1, operand2)
         operands.append(result)
     
     if len(operators) == 0 and len(operands) == 1:
         return operands[0]
-    else:
-        raise MalformedExpressionError("Invalid expression")
+    raise ValueError("Invalid expression")
 
 if __name__ == "__main__":
     with open("programs/test1.asm", "r") as test1:
