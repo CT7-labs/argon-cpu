@@ -4,7 +4,7 @@ class Token:
         self.token = token # directive, opcode, etc.
         self.value = value # register, immediate, etc.
     def __repr__(self):
-        return f"{self.token}: {self.value}"
+        return f"({self.token}: {self.value})"
 
 expression_operators = "( ) + - * / % << >> & | ^ ~ < > == !=".split()
 

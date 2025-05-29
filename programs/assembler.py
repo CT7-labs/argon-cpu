@@ -1,3 +1,6 @@
+from assembler_settings import * # constants, look-up tables, and configuration
+from assembly_exceptions import *
+
 """
 How the assembler should work (broadly)
 
@@ -8,10 +11,11 @@ Pass 1:
 Pass 2:
 - Store constants and links
 - Convert immediate tokens into imm16, imm32, etc. tokens
+- Remove macro definitions, store in separate dictionary
 
 Pass 3:
-- Replace constant tokens with actual token
 - Replace macros
+- Replace constant tokens
 
 Pass 4:
 - Evaluate expression tokens (taking constants into mind)
@@ -19,9 +23,6 @@ Pass 4:
 Should have valid object code that can be converted to
 machine code by a final pass
 """
-
-from assembler_settings import * # constants, look-up tables, and configuration
-from assembly_exceptions import *
 
 # stripper
 def strip_comment(line):
@@ -161,18 +162,43 @@ def get_constants(tokenized_lines):
 
     return constants
 
-def replace_constants(tokenized_lines, constants):
-    for line in tokenized_lines:
-        for token in line:
-            if token.token == "CONSTANT":
-                if token.value in constants:
-                    real_token = constants[token.value]
-                    token.token = real_token.token
-                    token.value = real_token.value
-                else:
-                    raise UndefinedMnemonicError(f"\"{token.value}\" is an undefined constant")
+def replace_constants(tokens, constants):
+    for tok in tokens:
+        if tok.token == "CONSTANT":
+            if tok.value in constants:
+                real_token = constants[tok.value]
+                tok.token = real_token.token
+                tok.value = real_token.value
+            else:
+                raise UndefinedMnemonicError(f"\"{token.value}\" is an undefined constant")
     
-    return tokenized_lines
+    return tokens
+
+def expand_macro(macro_line, macro_definitions):
+    macro = macro_line[0].value
+    if macro not in macro_definitions:
+        raise UndefinedMnemonicError(macro_line)
+    
+    macro_variables = {}
+    macro_lines = macro_definitions[macro]
+    macro_definition = macro_lines[0]
+
+    operands = len(macro_definition[2:])
+    for i in range(1, operands + 1):
+        macro_variables[macro_lines[0][i + 1].value] = macro_line[i]
+
+    expanded_lines = []
+    new_token = None
+    for line in macro_lines[1:-1]:
+        for token in line:
+            new_token = token
+            if token.token == "CONSTANT":
+                if token.value in macro_variables:
+                    new_token = macro_variables[token.value]
+            
+            expanded_lines.append(new_token)
+
+    return expanded_lines
 
 def tokenize_expression(expression):
     # Assumes expression is stripped of spaces
@@ -332,6 +358,41 @@ def evaluate_expression(expression, constants):
         return operands[0]
     raise ValueError("Invalid expression")
 
+def get_macro_definitions(tokenized_lines):
+    macro_definitions = {}
+    clean_lines = []
+
+    macro_name = ""
+    macro_lines = []
+    for line in tokenized_lines:
+        if line[0].value == "macro":
+            macro_name = line[1].value
+        
+        if macro_name:
+            macro_lines.append(line)
+        else:
+            clean_lines.append(line)
+        
+        if line[0].value == "endmacro":
+            macro_definitions[macro_name] = macro_lines.copy()
+            macro_lines.clear()
+            macro_name = ""
+        
+    return macro_definitions, clean_lines
+
+def generate_token_list(cleaned_token_lines, macro_definitions):
+    tokens = []
+
+    for line in cleaned_token_lines:
+        if line[0].token == "MACRO":
+            for tok in expand_macro(line, macro_definitions):
+                tokens.append(tok)
+        else:
+            for tok in line:
+                tokens.append(tok)
+    
+    return tokens
+
 if __name__ == "__main__":
     with open("programs/test1.asm", "r") as test1:
         asmlines = test1.readlines()
@@ -342,28 +403,15 @@ if __name__ == "__main__":
     for line in stripped:
         tokenized_lines.append(tokenize_line(line))
     
+    print("Raw Tokens:")
     for line in tokenized_lines:
         print(line)
     
     constants = get_constants(tokenized_lines)
+    macro_definitions, cleaned_token_lines = get_macro_definitions(tokenized_lines)
 
-    tokenized_expression = tokenized_lines[2][2].value
-    result = evaluate_expression(tokenized_expression, constants)
-    
-    print("\n", tokenized_expression)
-    print(result)
-    
-    """
-    constants = get_constants(tokenized_lines)
-    
-    print("Tokens:")
-    for line in tokenized_lines:
-        print(line)
-    
-    print("\nFound constants:")
-    print(constants)
+    token_list = generate_token_list(cleaned_token_lines, macro_definitions)
+    token_list = replace_constants(token_list, constants)
 
-    print("\nReplaced constants:")
-    replaced = replace_constants(tokenized_lines, constants)
-    for line in replaced:
-        print(line)"""
+    for tok in token_list:
+        print(tok)
