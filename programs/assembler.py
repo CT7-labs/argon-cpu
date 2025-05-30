@@ -1,50 +1,102 @@
+#!/usr/bin/env python3
 from assembler_settings import * # constants, look-up tables, and configuration
 from assembly_exceptions import *
 
-"""
-How the assembler should work (broadly)
+# helpful tokens
+ENDL    = "$ENDL"       # end line
+ENDF    = "$ENDF"       # end file
+STARTF  = "$STARTF"     # start file
+STARTEX = "$STARTEX"    # start expression
+ENDEX   = "$ENDEX"      # end expression
 
-Pass 1:
-- Remove comments
-- Tokenize lines
+def raw_to_blocks(raw):
+    # convert raw assembly into semantic blocks
+    index = 0
+    line = 1
+    column = 1
+    blocks = [STARTF]
+    current_block = ""
+    nextline = False
+    expression_depth = 0
 
-Pass 2:
-- Store constants and links
-- Convert immediate tokens into imm16, imm32, etc. tokens
-- Remove macro definitions, store in separate dictionary
+    # because the block-inator breaks without a newline at the end
+    if raw[-1] != "\n":
+        raw += "\n"
 
-Pass 3:
-- Replace macros
-- Replace constant tokens
+    try:
+        while index < len(raw):
+            c = raw[index]
+            index += 1
+            if index < len(raw):
+                nextc = raw[index]
+            else:
+                nextc = "\x00"
+            
+            if c in "\n#;":
+                nextline = True
+            
+            if c.isalnum() or c in "_.:":
+                current_block += c
+            
+            if c in " ,()\n":
+                if len(current_block) > 0:
+                    blocks.append(current_block)
+                    current_block = ""
+                    current_type = ""
+                else:
+                    if c == ",":
+                        raise IHonestlyDontKnowBoss(f"Too many separators at ({line}, {column})")
+            
+            if c in "()":
+                if c == "(":
+                    expression_depth += 1
+                elif c == ")":
+                    expression_depth -= 1
+                
+                if expression_depth < 0:
+                    raise IHonestlyDontKnowBoss(f"Bad expression at ({line}, {column})")
+                
+                blocks.append(c)
 
-Pass 4:
-- Evaluate expression tokens (taking constants into mind)
+            elif c in expression_operators or c + nextc in expression_operators:
+                if c in expression_operators and not c + nextc in expression_operators:
+                    blocks.append(c)
+                else:
+                    blocks.append(c + nextc)
 
-Should have valid object code that can be converted to
-machine code by a final pass
-"""
+                    index += 1
 
-# stripper
-def strip_comment(line):
-    line = line.replace("\n", "") # remove \n
-    commentIndex = line.find("#") # find comment index
-
-    if commentIndex >= 0:
-        return line[:commentIndex].strip() # removes comment text and extra spaces
+            
+            if nextline:
+                # reset types
+                current_type = ""
+                
+                if expression_depth != 0:
+                    raise IHonestlyDontKnowBoss(f"Bad expression at ({line}, {column})")
+                
+                # find newline
+                original_nextc = nextc
+                while c != "\n":
+                    c = raw[index]
+                    index += 1
+                
+                line += 1
+                column = 1
+                nextline = False
+                if blocks[-1] != ENDL and blocks[-1] != STARTF:
+                    blocks.append(ENDL)
+                continue
+            
+            column += 1
+    except IndexError:            
+        raise IHonestlyDontKnowBoss(
+            "something is unfinished, here's the deets",
+            f"Line: {line}",
+            f"Column: {column}",
+            f"Expression depth: {expression_depth}")
     
-    return line # return clean line
+    return blocks + [ENDF]
 
-def strip_comments(assembly_lines):
-    striped_lines = []
-
-    for line in assembly_lines:
-        stripped_line = strip_comment(line)
-        if stripped_line:
-            striped_lines.append(stripped_line)
-    
-    return striped_lines
-
-# tokenizer
 def immediate_to_int(block):
     # hexadecimal representation
     if block[0:2] == "0x":
@@ -60,183 +112,178 @@ def immediate_to_int(block):
     except ValueError:
         return None
 
-def block_to_token(block):
-    block = block.lower()
-
-    # tokenize register
-    if block in registers:
-        return Token("REGISTER", registers[block])
-
-    # tokenize immediate
-    immediate = immediate_to_int(block)
-    if immediate:
-        return Token("IMMEDIATE", immediate)
-    
-    # tokenize constant
-    if "(" in block or ")" in block:
-        clean_expression = block.replace(" ", "")
-        print(clean_expression)
-        return Token("EXPRESSION", tokenize_expression(clean_expression))
-    
-    return Token("CONSTANT", block)
-
-def tokenize_arguments(blocks, mnemonic, isInstruction, isDirective, isMacro):
+def blocks_to_tokens(blocks):
     tokens = []
 
-    for block in blocks:
-        tokens.append(block_to_token(block))
+    # make sure the blocks are blocks
+    assert blocks[0] == STARTF
+    assert blocks[-1] == ENDF
 
-    if isDirective:
-        if mnemonic == "macro":
-            tokens[0].token = "IDENTIFIER"
-    
-    return tokens
-
-def line_to_blocks(line):
-    line = line.strip().replace(",", "") # remove whitespace and commas (not required in Argon assembly)
-    blocks = []
-
-    expression_depth = 0
-    block = ""
-    for c in line:
-        if c == " " and expression_depth == 0:
-            blocks.append(block)
-            block = ""
-            continue
-        elif c == "(":
-            expression_depth += 1
-        elif c == ")":
-            expression_depth -= 1
-        
-        block += c
-    
-    if expression_depth != 0:
-        raise MalformedExpressionError()
-    
-    if block:
-        blocks.append(block)
-        
-    return blocks
-
-def tokenize_line(line):
-    tokens = []
-    blocks = line_to_blocks(line)
-    isInstruction = False
-    isDirective = False
-    isMacro = False
-
-    # directive
-    if blocks and blocks[0].startswith("."):
-        isDirective = True
-        mnemonic = blocks[0][1:].lower()
-
-        if mnemonic in directives:
-            tokens.append(Token("DIRECTIVE", mnemonic))
+    state = ""
+    block_index = 1 # skip STARTF
+    while block_index < len(blocks):
+        b = blocks[block_index]
+        if b != ENDF:
+            nb = blocks[block_index + 1]
         else:
-            raise UndefinedMnemonicError("Bad directive!")
-
-    # opcode mnemonic
-    elif blocks and blocks[0].lower() in mnemonics:
-        isInstruction = True
-        mnemonic = blocks[0].lower()
-        tokens.append(Token("OPCODE", mnemonic))
-
-    # macro mnemonic (assumed to be macro, we don't actually know if it is yet)
-    else:
-        isMacro = True
-        mnemonic = blocks[0].lower()
-        tokens.append(Token("MACRO", mnemonic))
+            break # we reached the end of the blocks
         
-    # get argument tokens
-    tokens += tokenize_arguments(blocks[1:], mnemonic, isInstruction, isDirective, isMacro)
-    
-    return tokens
-
-# constant replacer
-def get_constants(tokenized_lines):
-    constants = {}
-
-    for line in tokenized_lines:
-        if line[0].value == "define":
-            constants[line[1].value] = line[2]
-
-    return constants
-
-def replace_constants(tokens, constants):
-    for tok in tokens:
-        if tok.token == "CONSTANT":
-            if tok.value in constants:
-                real_token = constants[tok.value]
-                tok.token = real_token.token
-                tok.value = real_token.value
+        if b in mnemonics:
+            if b[0] != ".":
+                tokens.append(Token(
+                    "MNEMONIC",
+                    b,
+                    -1, # unknown
+                    -1, # unknown
+                    b
+                ))
             else:
-                raise UndefinedMnemonicError(f"\"{token.value}\" is an undefined constant")
+                tokens.append(Token(
+                    "DIRECTIVE",
+                    b,
+                    -1, # unknown
+                    -1, # unknown
+                    b
+                ))
+        elif b in sections:
+            tokens.append(Token(
+                "SECTION",
+                b,
+                -1,
+                -1,
+                b
+            ))
+        elif b in expression_operators:
+            tokens.append(Token(
+                "OPERATOR",
+                b,
+                -1, # unknown
+                -1, # unknown
+                b
+            ))
+        elif b == ENDL:
+            tokens.append(Token(
+                ENDL
+            ))
+        elif b in registers:
+            tokens.append(Token(
+                "REGISTER",
+                registers[b],
+                -1,
+                -1,
+                b
+            ))
+        elif b[-1] == ":":
+            tokens.append(Token(
+                "PROCEDURE",
+                b[:-1],
+                -1,
+                -1,
+                b
+            ))
+        else:
+            int_b = immediate_to_int(b)
+            if int_b:
+                tokens.append(Token(
+                    "IMMEDIATE",
+                    int_b,
+                    -1, # unknown
+                    -1, # unknown
+                    b
+                ))
+            else:
+                if blocks[block_index - 1] != ENDL:
+                    tokens.append(Token(
+                        "SYMBOL",
+                        b,
+                        -1, # unknown
+                        -1, # unknown
+                        b
+                    ))
+                else:
+                    tokens.append(Token(
+                        "MACRO",
+                        b,
+                        -1, # unknown
+                        -1, # unknown
+                        b
+                    ))
+
+        block_index += 1
     
     return tokens
 
-def expand_macro(macro_line, macro_definitions):
-    macro = macro_line[0].value
-    if macro not in macro_definitions:
-        raise UndefinedMnemonicError(macro_line)
-    
-    macro_variables = {}
-    macro_lines = macro_definitions[macro]
-    macro_definition = macro_lines[0]
+def get_symbol_definitions(tokens, namespace="global"):
+    # returns dictionary containing symbol labels and their values
+    # while verifying that the .define directive 
+    symbols = {}
+    symbols[namespace] = {}
 
-    operands = len(macro_definition[2:])
-    for i in range(1, operands + 1):
-        macro_variables[macro_lines[0][i + 1].value] = macro_line[i]
-
-    expanded_lines = []
-    new_token = None
-    for line in macro_lines[1:-1]:
-        for token in line:
-            new_token = token
-            if token.token == "CONSTANT":
-                if token.value in macro_variables:
-                    new_token = macro_variables[token.value]
-            
-            expanded_lines.append(new_token)
-
-    return expanded_lines
-
-def tokenize_expression(expression):
-    # Assumes expression is stripped of spaces
-    tokens = []
-    expression_operators = ["+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "~", "<", ">", "==", "!=", "(", ")"]
-    
     i = 0
-    while i < len(expression):
-        # Try to match the longest operator starting at i
-        matched_operator = None
-        for op in sorted(expression_operators, key=len, reverse=True):  # Longest first
-            if expression.startswith(op, i):
-                matched_operator = op
-                break
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok.token == "DIRECTIVE" and tok.value == ".define":
+            symbol_tok = tokens[i + 1]
+            value_tok = tokens[i + 2]
+            symbols[namespace][symbol_tok.value] = value_tok
+            i += 3
+        elif tok.token == "PROCEDURE":
+            namespace = tok.value
+            symbols[namespace] = {}
+            i += 1
+        else:
+            i += 1
+    
+    return symbols
+
+def parse_macro_definitions(tokens):
+    macro_definitions = {}
+    out_tokens = []
+    
+    current_tokens = []
+    current_identifier = ""
+    reading_macro = False
+    for tok in tokens:
+        if reading_macro:
+            if not current_identifier:
+                current_identifier = tok.value
+            elif tok.value != ".endmacro":
+                current_tokens.append(tok)
+            else:
+                macro_definitions[current_identifier] = current_tokens
+                current_identifier = ""
+                current_tokens = []
+                reading_macro = False
+                continue
+    
+        else:
+            if tok.value == ".macro":
+                reading_macro = True
+                continue
+            else:
+                if not (tok.token == ENDL and out_tokens[-1].token == ENDL):
+                    out_tokens.append(tok)
+            
+    return macro_definitions, out_tokens
+
+def replace_symbols(tokens, symbols, namespace="global"):
+    # replaces the symbol tokens within the tokens list, then returns the new tokens
+
+    i = 0
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok.token == "SYMBOL":
+            tokens[i] = symbols[namespace][tok.value]
+        elif tok.token == "PROCEDURE":
+            namespace = tok.value
+            symbols[namespace] = {}
         
-        if matched_operator:
-            tokens.append(matched_operator)
-            i += len(matched_operator)
-            continue
-        
-        # Accumulate alphanumeric or underscore for variable/number
-        if expression[i].isalnum() or expression[i] == "_":
-            token = ""
-            while i < len(expression) and (expression[i].isalnum() or expression[i] == "_"):
-                token += expression[i]
-                i += 1
-            # Try to convert to integer (handles decimal, hex like 0x4)
-            try:
-                tokens.append(int(token, 0))  # Base 0 handles 0x, 0b, etc.
-            except ValueError:
-                tokens.append(token)  # Variable name
-            continue
-        
-        raise ValueError(f"Invalid character in expression: {expression[i]}")
+        i += 1
     
     return tokens
 
 def precedence(operator):
+    # C-like operation precedence, according to Grok
     if operator in ["+", "-"]:
         return 0
     elif operator in ["|"]:
@@ -358,60 +405,62 @@ def evaluate_expression(expression, constants):
         return operands[0]
     raise ValueError("Invalid expression")
 
-def get_macro_definitions(tokenized_lines):
-    macro_definitions = {}
-    clean_lines = []
-
-    macro_name = ""
-    macro_lines = []
-    for line in tokenized_lines:
-        if line[0].value == "macro":
-            macro_name = line[1].value
-        
-        if macro_name:
-            macro_lines.append(line)
+def print_blocks(blocks):
+    for b in blocks:
+        if b != ENDL:
+            print(b, end=" ")
         else:
-            clean_lines.append(line)
-        
-        if line[0].value == "endmacro":
-            macro_definitions[macro_name] = macro_lines.copy()
-            macro_lines.clear()
-            macro_name = ""
-        
-    return macro_definitions, clean_lines
+            print()
 
-def generate_token_list(cleaned_token_lines, macro_definitions):
-    tokens = []
-
-    for line in cleaned_token_lines:
-        if line[0].token == "MACRO":
-            for tok in expand_macro(line, macro_definitions):
-                tokens.append(tok)
+def print_tokens(tokens, verbose=False):
+    for tok in tokens:
+        if tok.token != ENDL:
+            print(tok, end=" ")
         else:
-            for tok in line:
-                tokens.append(tok)
-    
-    return tokens
+            print(tok) if verbose else print()
+
+"""
+How the assembler should work (broadly)
+
+Step 1:
+- Convert raw assembly into blocks (remove comments, spaces, and newlines)
+- Convert blocks into tokens
+
+Pass 2:
+- Store symbol definitions
+
+Pass 3:
+- Remove macro definitions and store in separate dictionary
+
+Pass 4:
+- Replace symbols (bearing sections in mind)
+
+Pass 5
+- Expand macros
+
+Pass 6:
+
+Should have valid object code that can be converted to
+machine code by a final pass
+"""
 
 if __name__ == "__main__":
     with open("programs/test1.asm", "r") as test1:
-        asmlines = test1.readlines()
+        rawtext = test1.read()
 
-    stripped = strip_comments(asmlines)
-    
-    tokenized_lines = []
-    for line in stripped:
-        tokenized_lines.append(tokenize_line(line))
-    
-    print("Raw Tokens:")
-    for line in tokenized_lines:
-        print(line)
-    
-    constants = get_constants(tokenized_lines)
-    macro_definitions, cleaned_token_lines = get_macro_definitions(tokenized_lines)
+    # step 1
+    blocks = raw_to_blocks(rawtext)
+    tokens = blocks_to_tokens(blocks)
+    print_tokens(tokens)
 
-    token_list = generate_token_list(cleaned_token_lines, macro_definitions)
-    token_list = replace_constants(token_list, constants)
+    # step 2
+    symbols = get_symbol_definitions(tokens)
 
-    for tok in token_list:
-        print(tok)
+    # step 3
+    macro_definitions, no_macro_definitions_tokens = parse_macro_definitions(tokens)
+    print_tokens(no_macro_definitions_tokens, 1)
+
+    # step 4
+    expanded_tokens = expand_macros(no_macro_definitions_tokens, macro_definitions)
+
+    # step 5
