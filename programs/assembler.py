@@ -121,7 +121,6 @@ def blocks_to_tokens(blocks):
 
     state = ""
     block_index = 1 # skip STARTF
-    expression_depth = 0
     while block_index < len(blocks):
         b = blocks[block_index]
         if b != ENDF:
@@ -162,31 +161,6 @@ def blocks_to_tokens(blocks):
                 -1, # unknown
                 b
             ))
-
-            if b == "~":
-                if expression_depth == 0:
-                    tokens.insert(-1, Token(
-                        STARTEX
-                    ))
-                expression_depth += 0.5
-
-            elif b == "(":
-                if expression_depth == 0:
-                    tokens.insert(-1, Token(
-                        STARTEX
-                    ))
-                
-                expression_depth += 1
-            elif b == ")":
-                if expression_depth == 0:
-                    raise MalformedExpressionError("Bad expression!")
-                
-                expression_depth -= 1
-                if expression_depth < 1:
-                    tokens.append(Token(
-                        ENDEX
-                    ))
-            
         elif b == ENDL:
             tokens.append(Token(
                 ENDL
