@@ -122,6 +122,7 @@ def blocks_to_tokens(blocks):
     state = ""
     block_index = 1 # skip STARTF
     expression_depth = 0
+    in_macro = False
     while block_index < len(blocks):
         b = blocks[block_index]
         if b != ENDF:
@@ -146,6 +147,11 @@ def blocks_to_tokens(blocks):
                     -1, # unknown
                     b
                 ))
+
+                if b == '.macro':
+                    in_macro = True
+                elif b == '.endmacro':
+                    in_macro = False
         elif b in sections:
             tokens.append(Token(
                 "SECTION",
@@ -219,13 +225,22 @@ def blocks_to_tokens(blocks):
                 ))
             else:
                 if blocks[block_index - 1] != ENDL:
-                    tokens.append(Token(
-                        "SYMBOL",
-                        b,
-                        -1, # unknown
-                        -1, # unknown
-                        b
-                    ))
+                    if not in_macro:
+                        tokens.append(Token(
+                            "SYMBOL",
+                            b,
+                            -1, # unknown
+                            -1, # unknown
+                            b
+                        ))
+                    else:
+                        tokens.append(Token(
+                            "ARGUMENT",
+                            b,
+                            -1, # unknown
+                            -1, # unknown
+                            b
+                        ))
                 else:
                     tokens.append(Token(
                         "MACRO",
@@ -239,11 +254,10 @@ def blocks_to_tokens(blocks):
     
     return tokens
 
-def get_symbol_definitions(tokens, namespace="global"):
+def get_symbol_definitions(tokens):
     # returns dictionary containing symbol labels and their values
     # while verifying that the .define directive 
     symbols = {}
-    symbols[namespace] = {}
 
     i = 0
     while i < len(tokens):
@@ -251,12 +265,11 @@ def get_symbol_definitions(tokens, namespace="global"):
         if tok.token == "DIRECTIVE" and tok.value == ".define":
             symbol_tok = tokens[i + 1]
             value_tok = tokens[i + 2]
-            symbols[namespace][symbol_tok.value] = value_tok
+            if symbol_tok.value not in symbols:
+                symbols[symbol_tok.value] = value_tok
+            else:
+                raise IHonestlyDontKnowBoss("repeated .define statement")
             i += 3
-        elif tok.token == "PROCEDURE":
-            namespace = tok.value
-            symbols[namespace] = {}
-            i += 1
         else:
             i += 1
     
@@ -292,22 +305,65 @@ def parse_macro_definitions(tokens):
             
     return macro_definitions, out_tokens
 
-def replace_symbols(tokens, symbols, namespace="global"):
+def replace_symbols(tokens, symbols):
     # replaces the symbol tokens within the tokens list, then returns the new tokens
 
     i = 0
     while i < len(tokens):
         tok = tokens[i]
         if tok.token == "SYMBOL":
-            tokens[i] = symbols[namespace][tok.value]
-        elif tok.token == "PROCEDURE":
-            namespace = tok.value
-            symbols[namespace] = {}
+            if tok.value in symbols:
+                new_token = symbols[tok.value]
+                tokens.pop(i) # discard old token
+
+                if type(new_token) is Token:
+                    tokens.insert(i, symbols[tok.value])
+                else:
+                    increment = 0
+                    for t in new_token:
+                        tokens.insert(i + increment, t)
+                        increment += 1
+
+            else:
+                raise IHonestlyDontKnowBoss("Undefined symbol!")
         
         i += 1
     
     return tokens
 
+def expand_macro(tokens, macro_definitions):
+    """
+    - tokens should contain just the line of the macro, including the $ENDL token
+    - macros should contain all macro definitions sourced from parse_macro_definitions()
+    """
+
+    out_tokens = []
+
+    index = 0
+    while index < len(tokens):
+        
+    
+def expand_macros(tokens, macro_definitions):
+    """Take in the full token list and return expanded tokens"""
+
+    macros = []
+    m = []
+    in_macro = False
+    for tok in tokens:
+
+        if tok.token == "MACRO":
+            in_macro = True
+        elif tok.token == ENDL:
+            if in_macro: in_macro = False
+            if m:
+                macros.append(m.copy())
+                m.clear()
+        
+        if in_macro:
+            m.append(tok)
+    
+    return macros
+        
 def precedence(operator):
     # C-like operation precedence, according to Grok
     if operator in ["+", "-"]:
@@ -459,12 +515,16 @@ Pass 3:
 - Remove macro definitions and store in separate dictionary
 
 Pass 4:
-- Replace symbols (bearing sections in mind)
+- Replace symbols
 
 Pass 5
 - Expand macros
 
 Pass 6:
+- Evaluate expressions
+
+Pass 7:
+- Done?
 
 Should have valid object code that can be converted to
 machine code by a final pass
@@ -474,19 +534,22 @@ if __name__ == "__main__":
     with open("programs/test1.asm", "r") as test1:
         rawtext = test1.read()
 
-    # step 1
+    # step 1: tokenize file
     blocks = raw_to_blocks(rawtext)
     tokens = blocks_to_tokens(blocks)
-    print_tokens(tokens)
 
-    # step 2
+    # step 2: get symbol definitions
     symbols = get_symbol_definitions(tokens)
 
-    # step 3
+    # step 3: get macro definitions
     macro_definitions, no_macro_definitions_tokens = parse_macro_definitions(tokens)
-    print_tokens(no_macro_definitions_tokens, 1)
+    print_tokens(no_macro_definitions_tokens)
+    print()
 
-    # step 4
-    expanded_tokens = expand_macros(no_macro_definitions_tokens, macro_definitions)
+    # step 4: replace symbols
+    replaced_tokens = replace_symbols(no_macro_definitions_tokens, symbols)
+    print_tokens(replaced_tokens)
 
-    # step 5
+    # step 5: expand macros
+    expanded_tokens = expand_macros(replaced_tokens, macro_definitions)
+    print(expanded_tokens)

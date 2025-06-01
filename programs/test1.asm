@@ -9,8 +9,4 @@
 
 .section .text
 main:
-    li s1, 5
-    li SOME_REGISTER, 7
-    li s3, ~(RANDOM - 4)
-    add s0, s1, s2 # 12 = 5 + 7
-    sub s0, s0, s3 # 3 = 12 - 9
+    li s1, (RANDOM + 5) # try with RANDOM next

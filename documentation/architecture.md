@@ -93,12 +93,12 @@ the value in "write only" register.
 - CLRB rd, shamt
 
 ### ALU shifting
-- SLL rd, rs, rs
-- SLLI rd, rs, shamt
-- SRL rd, rs, rs
-- SRLI rd, rs, shamt
-- SRA rd, rs, rs
-- SRAI rd, rs, shamt
+- SLL rd, rs, shamt
+- SRL rd, rs, shamt
+- SRA rd, rs, shamt
+- SLLV rd, rs, rs
+- SRLV rd, rs, rs
+- SRAV rd, rs, rs
 
 ### Branching / jumping
 - BEQ rs, rt, offset16
