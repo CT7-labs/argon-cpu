@@ -331,17 +331,45 @@ def replace_symbols(tokens, symbols):
     
     return tokens
 
-def expand_macro(tokens, macro_definitions):
+def expand_macro(line, macro_definitions):
     """
-    - tokens should contain just the line of the macro, including the $ENDL token
+    - line should contain just the tokens of the macro being invoked, including the $ENDL token
     - macros should contain all macro definitions sourced from parse_macro_definitions()
     """
 
     out_tokens = []
-
+    definition = macro_definitions[tokens[0].value]
     index = 0
-    while index < len(tokens):
-        
+    while index < len(definition):
+        if definition[index].token == ENDL:
+            break
+        index += 1
+    
+    arguments = definition[:index]
+    instructions = definition[index+1:]
+    argument_key = {}
+
+    argument_index = 0
+    scratch = []
+    in_expression = False
+    for token in line:
+        if token.token != "ARGUMENT":
+            out_tokens.append(token)
+        elif token.token == "ARGUMENT":
+            if not in_expression:
+                argument_key[arguments[argument_index]] = token
+                argument_index += 1
+            else:
+                scratch.append(token)
+        elif token.token == STARTEX:
+            in_expression = True
+            argument_index += 1
+        elif token.token == ENDEX:
+            in_expression = False
+            argument_key[arguments[argument_index]] = scratch.copy()
+            argument_index += 1
+    
+    return argument_key
     
 def expand_macros(tokens, macro_definitions):
     """Take in the full token list and return expanded tokens"""
@@ -356,13 +384,18 @@ def expand_macros(tokens, macro_definitions):
         elif tok.token == ENDL:
             if in_macro: in_macro = False
             if m:
+                m.append(Token(ENDL))
                 macros.append(m.copy())
                 m.clear()
         
         if in_macro:
             m.append(tok)
     
-    return macros
+    expanded_macros = []
+    for macro in macros:
+        expanded_macros.append(expand_macro(macro, macro_definitions))
+    
+    return expanded_macros
         
 def precedence(operator):
     # C-like operation precedence, according to Grok
@@ -543,12 +576,9 @@ if __name__ == "__main__":
 
     # step 3: get macro definitions
     macro_definitions, no_macro_definitions_tokens = parse_macro_definitions(tokens)
-    print_tokens(no_macro_definitions_tokens)
-    print()
 
     # step 4: replace symbols
     replaced_tokens = replace_symbols(no_macro_definitions_tokens, symbols)
-    print_tokens(replaced_tokens)
 
     # step 5: expand macros
     expanded_tokens = expand_macros(replaced_tokens, macro_definitions)

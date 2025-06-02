@@ -9,4 +9,4 @@
 
 .section .text
 main:
-    li s1, (RANDOM + 5) # try with RANDOM next
+    li s1, (RANDOM + 5)
