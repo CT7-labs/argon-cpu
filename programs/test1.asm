@@ -1,12 +1,7 @@
 # addition
-.define SOME_REGISTER s2
-.define RANDOM 5
-
-.macro li reg1, imm32
-    lui reg1, (imm32 >> 16)
-    ori reg1, (imm32 & 0xFFFF)
-.endmacro
+.define reg1, s0
+.define imm32, 0x1234CDEF
 
 .section .text
-main:
-    li s1, (RANDOM + 5)
+.break
+add r1, r2, r3

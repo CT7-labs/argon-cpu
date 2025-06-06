@@ -1,25 +1,61 @@
-# Constants
+"""
+No macro support just yet, we'll add that later
+
+=== General Token Types: ===
+REGISTER    :   self-explanatory
+IMMEDIATE   :   an immediate value
+SYMBOL      :   symbol that needs to be replaced from the symbol table
+OPERATOR    :   mathematical operators like ~, +, and ()
+OPCODE      :   instruction opcode
+DIRECTIVE   :   assembler directive
+
+=== Organization Token Types: ===
+SEP         :   represents a comma between operands (i.e., ADD t0, t1, t2)
+ENDL        :   endline
+STARTEX     :   Start of an expression
+ENDEX       :   End of an expression
+
+"""
+
+# token constants
+REGISTER    = "register"
+IMMEDIATE   = "IMMEDIATE"
+SYMBOL      = "SYMBOL"
+OPERATOR    = "OPERATOR"
+OPCODE      = "OPCODE"
+DIRECTIVE   = "DIRECTIVE"
+SEP         = "$SEP"
+ENDL        = "$ENDL"
+STARTEX     = "$STARTEX"
+ENDEX       = "$ENDEX"
+
 class Block:
-    def __init__(self, data, line, column):
-        self.data = data
+    def __init__(self, value, line):
+        self.value = value
         self.line = line
-        self.column = column
+    def __repr__(self):
+        return f"({self.value} @ {self.line})"
 
 class Token:
-    def __init__(self, token=None, value=None, position=None, size=None, raw=None):
+    def __init__(self, token=None, value=None, line=None, size=None):
         self.token = token # directive, opcode, etc.
         self.value = value # register, immediate, etc.
-        self.position = position # (line number, column)
+        self.line = line # line number
         self.size = size # size in bytes
-        self.raw = raw # raw, original form of the token
     def __repr__(self):
+        out = ""
         if self.token[0:1] != "$":
-            return f"({self.token}: {self.value})"
+            out += f"{self.token}: {self.value}"
         else:
-            return f"{self.token}"
-
-def is_token(tok):
-    return type(tok) == Token
+            out += f"{self.token}"
+        
+        if self.line:
+            out += f" @ {self.line}"
+        
+        return f"({out})"
+    
+    def __eq__(self, x):
+        return self.token == x
 
 expression_operators = "( ) + - * / % << >> & | ^ ~ < > == !=".split()
 
