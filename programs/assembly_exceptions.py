@@ -9,4 +9,4 @@ class IHonestlyDontKnowBoss(Exception):
     pass
 
 class MalformedExpressionError(Exception):
-    pass
+    pass    

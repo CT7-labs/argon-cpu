@@ -22,7 +22,7 @@ REGISTER    = "register"
 IMMEDIATE   = "IMMEDIATE"
 SYMBOL      = "SYMBOL"
 OPERATOR    = "OPERATOR"
-OPCODE      = "OPCODE"
+MNEMONIC    = "MNEMONIC"
 DIRECTIVE   = "DIRECTIVE"
 SEP         = "$SEP"
 ENDL        = "$ENDL"
@@ -38,7 +38,7 @@ class Block:
 
 class Token:
     def __init__(self, token=None, value=None, line=None, size=None):
-        self.token = token # directive, opcode, etc.
+        self.token = token # directive, mnemonic, etc.
         self.value = value # register, immediate, etc.
         self.line = line # line number
         self.size = size # size in bytes
@@ -185,7 +185,7 @@ mnemonics = {
     ".define": 2,
     ".macro": -1,
     ".endmacro": 0,
-    ".section": 1,
+    ".text": 0
 }
 
 sections = [
