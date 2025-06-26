@@ -19,15 +19,15 @@ bytes from the MMU too.
 # Instruction types
 ### I-type
 6-bit opcode
-5-bit rs
 5-bit rd
+5-bit rs
 16-bit immediate
 
 ### R-type
 6-bit opcode
+5-bit rd
 5-bit rs
 5-bit rt
-5-bit rd
 5-bit shamt
 6-bit funct
 
@@ -89,8 +89,10 @@ the value in "write only" register.
 - XORI rd, rs, imm16
 
 ### ALU bit operations
-- SETB rd, shamt
-- CLRB rd, shamt
+- SETB rd, rs, rt
+- CLRB rd, rs, rt
+- SETBI rd, rs, shamt
+- CLRBI rd, rs, shamt
 
 ### ALU shifting
 - SLL rd, rs, shamt

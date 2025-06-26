@@ -2,6 +2,9 @@
 class UndefinedMnemonicError(Exception):
     pass
 
+class UndefinedSymbolError(Exception):
+    pass
+
 class RegisterIndexOutOfRange(Exception):
     pass
 

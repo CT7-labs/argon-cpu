@@ -24,10 +24,8 @@ SYMBOL      = "SYMBOL"
 OPERATOR    = "OPERATOR"
 MNEMONIC    = "MNEMONIC"
 DIRECTIVE   = "DIRECTIVE"
-SEP         = "$SEP"
+LABEL       = "LABEL"
 ENDL        = "$ENDL"
-STARTEX     = "$STARTEX"
-ENDEX       = "$ENDEX"
 
 class Block:
     def __init__(self, value, line):
@@ -185,14 +183,60 @@ mnemonics = {
     ".define": 2,
     ".macro": -1,
     ".endmacro": 0,
-    ".text": 0
+    ".section": 1
 }
 
 sections = [
-    ".text", # code
-    ".data"  # initialized data
+    "CODE", # code
+    "DATA"  # initialized data
 ]
 
 std_procedures = [
     ".main"
+]
+
+rtype_mnemonics = [
+    "add",
+    "sub",
+    "and",
+    "or",
+    "nor",
+    "xor",
+    "setb",
+    "clrb",
+    "setbi",
+    "clrbi",
+    "sll",
+    "srl",
+    "sra",
+    "sllv",
+    "srlv",
+    "srav",
+    "slt",
+    "sltu",
+    "jmpr",
+    "jalr"
+]
+
+itype_mnemonics = [
+    "addi",
+    "subi",
+    "andi",
+    "ori",
+    "nori",
+    "xori",
+    "beq",
+    "bne",
+    "lui",
+    "lw",
+    "lh",
+    "lb",
+    "sw",
+    "sh",
+    "sb"
+]
+
+jtype_mnemonics = [
+    "jmp",
+    "jal"
 ]
