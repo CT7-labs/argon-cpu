@@ -6,7 +6,7 @@ Custom CPU with heavy inspiration drawn from MIPS to be implemented on an iCE40H
 - 32x registers
 - 32-bit fixed-width instructions
 - Simple interrupt support
-- 64x I/O pins directly accessible from registers
+- 64x I/O pins with data direction contral directly accessible from registers, not memory
 - No pipelining planned yet (this is my first CPU chill)
 
 Check out `documentation/architecture` for more info
