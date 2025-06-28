@@ -25,7 +25,7 @@ Because of my lack of experience and want for simplicity, I've made some interes
     - Latch PC and 4 into ALU sources
 2. Instruction Decode
     - Setup control signals
-    - New PC is latched to ALU output
+    - ALU result is latched to ALU output
 3. Instruction Execute
     - Latch new sources into ALU
     - Latch ALU output into PC
