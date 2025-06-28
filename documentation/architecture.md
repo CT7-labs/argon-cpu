@@ -59,6 +59,11 @@ Special registers
 - Interrupt status (is)
 - Return address (ra)
 
+Status register:
+- halt (0)
+- error (1)
+- reserved (3-31)
+
 ### r28-31
 I/O registers (map to 64 pins with direction control)
 
@@ -103,8 +108,8 @@ the value in "write only" register.
 - SRAV rd, rs, rs
 
 ### Branching / jumping
-- BEQ rs, rt, offset16
-- BNE rs, rt, offset16
+- BEQ rs, rt, imm16
+- BNE rs, rt, imm16
 - SLT rd, rs, rt
 - SLTU rd, rs, rt
 - JMP jtarg26
@@ -114,9 +119,9 @@ the value in "write only" register.
 
 ### Memory operations
 - LUI rd, imm16
-- LW rd, rs, offset16
-- LH rd, rs, offset16
-- LB rd, rs, offset16
-- SW rs, rt, offset16
-- SH rs, rt, offset16
-- SB rs, rt, offset16
+- LW rd, rs, imm16
+- LH rd, rs, imm16
+- LB rd, rs, imm16
+- SW rs, rt, imm16
+- SH rs, rt, imm16
+- SB rs, rt, imm16
