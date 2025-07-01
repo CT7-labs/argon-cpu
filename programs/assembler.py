@@ -406,8 +406,12 @@ def blob_to_bytecode(blob):
     elif mnemonic in itype_mnemonics:
         op = 2 + itype_mnemonics.index(mnemonic) # to avoid 0 (reserved) and 1 (r-type)
         rd = blob[1].value
-        rs = blob[2].value
-        imm16 = blob[3].value
+        if len(blob) == 4:
+            rs = blob[2].value
+            imm16 = blob[3].value
+        else:
+            rs = 0
+            imm16 = blob[2].value
 
         return get_itype_bytes(op, rd, rs, imm16)
     elif mnemonic in jtype_mnemonics:

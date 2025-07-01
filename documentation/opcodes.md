@@ -19,16 +19,16 @@
 | 5     | `xor`             | `rd` = `rs` ^ `rt`          |
 | 6     | `setb`            | `rd`[`shamt`] = 1              |
 | 7     | `clrb`            | `rd`[`shamt`] = 0              |
-| 10    | `sll`             | `rd` = `rt` << `shamt`      |
-| 11    | `srl`             | `rd` = `rt` >> `shamt`      |
-| 12    | `sra`             | `rd` = `rt` >>> `shamt`      |
-| 13    | `sllv`            | `rd` = `rt` << `rs`         |
-| 14    | `srlv`            | `rd` = `rt` >> `rs`         |
-| 15    | `srav`            | `rd` = `rt` >>> `rs`         |
-| 16    | `slt`*            | `rd` = (`rs` < `rt`) ? 1 : 0 |
-| 17    | `sltu`            | `rd` = (`rs` < `rt`) ? 1 : 0 |
-| 18    | `jmpr`            | `pc` = `rs` |
-| 19    | `jalr`            | `rd` = `pc+4` then `pc` = `rs` |
+| 8    | `sll`             | `rd` = `rt` << `shamt`      |
+| 9    | `srl`             | `rd` = `rt` >> `shamt`      |
+| 10    | `sra`             | `rd` = `rt` >>> `shamt`      |
+| 11    | `sllv`            | `rd` = `rt` << `rs`         |
+| 12    | `srlv`            | `rd` = `rt` >> `rs`         |
+| 13    | `srav`            | `rd` = `rt` >>> `rs`         |
+| 14    | `slt`*            | `rd` = (`rs` < `rt`) ? 1 : 0 |
+| 15    | `sltu`            | `rd` = (`rs` < `rt`) ? 1 : 0 |
+| 16    | `jmpr`            | `pc` = `rs` |
+| 17    | `jalr`            | `rd` = `pc+4` then `pc` = `rs` |
 
 # I-type
     Because the I-type instructions don't have space for a funct6 field, each instruction takes up a regular opcode.

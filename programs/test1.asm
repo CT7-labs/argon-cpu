@@ -4,10 +4,8 @@
 
 .section CODE
 .main:
-    add r1, r2, reg1
-    addi r1, r1, 15
-    jmp .test
-
-.test:
-    subi r1, r1, 15 + 1
-    add r0, r0, r0
+    ori r1, zero, 0xFF
+    ori r2, zero, 0xFFFF
+    sll r2, r2, 16
+    add r3, r1, r2
+    lui r31, 0xAAAA

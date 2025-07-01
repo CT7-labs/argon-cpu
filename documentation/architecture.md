@@ -1,6 +1,6 @@
 # Argon Architecture Overview
 - RISC ISA
-- Little-Endian
+- Big-Endian (it's slightly less of a headache)
 - 32-bit data width
 - 32-bit fixed-width instructions
 - I-type, R-type, and J-type instructions (inspired by MIPS)
@@ -120,8 +120,10 @@ the value in "write only" register.
 ### Memory operations
 - LUI rd, imm16
 - LW rd, rs, imm16
-- LH rd, rs, imm16
-- LB rd, rs, imm16
+- LH rd, rs, imm16  // Sign-extends
+- LW rd, rs, imm16  // Sign-extends
+- LHU rd, rs, imm16 // Zero-extends
+- LBU rd, rs, imm16 // Zero-extends
 - SW rs, rt, imm16
 - SH rs, rt, imm16
 - SB rs, rt, imm16

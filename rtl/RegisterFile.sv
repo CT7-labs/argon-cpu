@@ -9,7 +9,8 @@ module RegisterFile (
 
     output reg [31:0] o_portA,
     output reg [31:0] o_portB,
-    input wire [31:0] i_portW
+    input wire [31:0] i_portW,
+    input wire i_write_en,
 );
 
     reg [31:0] file [1:31];
@@ -18,7 +19,7 @@ module RegisterFile (
     always_ff @(posedge i_clk or posedge i_reset) begin
         if (i_reset) begin
             // handle reset logic
-            for (integer i = 1; i = i + 1; i < 32) begin
+            for (integer i = 1; i < 32; i = i + 1) begin
                 file[i] <= 32'h0;
             end
 
@@ -30,7 +31,7 @@ module RegisterFile (
 
             o_portA <= (i_selectA > 0) ? file[i_selectA] : 32'h0;
             o_portB <= (i_selectB > 0) ? file[i_selectB] : 32'h0; 
-            end
+        end
     end
     
 endmodule

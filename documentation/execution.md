@@ -6,7 +6,7 @@ Because of my lack of experience and want for simplicity, I've made some interes
 2. Assuming cache hit, instructions take 1 cycle to load (some crude prefetching on the WB step to make this happen)
 3. Every instruction will cost 5 clock cycles
 
-# R-type memory access instruction
+# R-type memory read instruction
 1. Instruction Fetch
     - Latch instruction from memory
 2. Instruction Decode
@@ -15,16 +15,19 @@ Because of my lack of experience and want for simplicity, I've made some interes
     - Latch address into memory
 4. Memory
     - Wait 1 cycle
+    - Latch data read mask into memory
     - Latch new instruction address into memory
 5. Register Writeback
     - Latch memory output into register
+    - Latch instruction read mask into memory
     - Wait 1 cycle
 
 # ALU usage
 1. Instruction Fetch
-    - Latch PC and 4 into ALU sources
+    - Latch PC, 4 into ALU sources
+    - Select ADD opcode
 2. Instruction Decode
-    - Setup control signals
+    - Setup control signals (with ALU opcode)
     - ALU result is latched to ALU output
 3. Instruction Execute
     - Latch new sources into ALU

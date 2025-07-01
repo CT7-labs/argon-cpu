@@ -1,8 +1,8 @@
 # Makefile for Verilating and running simulations to assist Argon's development
 RTL_DIR = rtl
-TOP_MODULE = Argon
+TOP_MODULE = ArgonTB
 SIM_DIR = sim
-OBJ_NAME = VArgon
+OBJ_NAME = VArgonTB
 SIM_OBJ = $(SIM_DIR)/$(OBJ_NAME)
 TRACE_FILE = dump.fst
 
