@@ -204,8 +204,6 @@ rtype_mnemonics = [
     "xor",
     "setb",
     "clrb",
-    "setbi",
-    "clrbi",
     "sll",
     "srl",
     "sra",

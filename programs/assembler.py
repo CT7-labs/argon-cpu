@@ -372,24 +372,28 @@ def print_blobs(blobs):
         print(b)
 
 def get_rtype_bytes(op, rd, rs, rt, shamt, funct):
-    result = ((op & 0b111111) |
-              (rd & 0b11111) << 6 |
-              (rs & 0b11111) << 11 |
-              (rt & 0b11111) << 16 |
-              (shamt & 0b11111) << 21 |
-              (funct & 0b111111) << 26)
-    return result.to_bytes(4, byteorder="little")
+    result = ((op & 0b111111) |          # bits 5–0
+              (rs & 0b11111) << 6 |      # bits 10–6
+              (rd & 0b11111) << 11 |     # bits 15–11
+              (rt & 0b11111) << 16 |     # bits 20–16
+              (shamt & 0b11111) << 21 |  # bits 25–21
+              (funct & 0b111111) << 26)  # bits 31–26
+    result_bytes = result.to_bytes(4, byteorder="little")
+    assert result < 2 ** 32
+    return result_bytes
 
 def get_itype_bytes(op, rd, rs, imm16):
     result = ((op & 0b111111) |
-              (rd & 0b11111) << 6 |
-              (rs & 0b11111) << 11 |
+              (rs & 0b11111) << 6 |
+              (rd & 0b11111) << 11 |
               (imm16 & 0xFFFF) << 16)
+    assert result < 2 ** 32
     return result.to_bytes(4, byteorder="little")
 
 def get_jtype_bytes(op, offset26):
     result = ((op & 0b111111) |
                offset26 & 0x3ffffff << 6)
+    assert result < 2 ** 32
     return result.to_bytes(4, byteorder="little")
 
 def blob_to_bytecode(blob):
@@ -487,6 +491,7 @@ tokens = tokenize_blocks(blocks)
 blobs = tokens_to_blobs(tokens)
 procedures = parse_blobs(blobs)
 bytecode = procedures_to_bytecode(procedures)
-print_bytecode(bytecode, "hex")
+
+print_bytecode(bytecode, 'hex')
 print()
-print_bytecode(bytecode, "bits")
+print_bytecode(bytecode, 'bits')
