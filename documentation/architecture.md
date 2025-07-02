@@ -8,8 +8,7 @@
 - 64 opcodes
 
 Argon will be implemented on an iCE40HX8K that has quite a few pins
-broken out to pin headers and peripherals (PMOD, SD card in SPI mode, GPIO, etc.)
-so I'm dedicating a few registers to I/O instead of writing a fancy MMU in Verilog. The mmu will still have to handle writing to Krypton
+broken out to pin headers and peripherals (PMOD, SD card in SPI mode, GPIO, etc.) so I'm dedicating a few registers to I/O instead of writing a fancy MMU in Verilog. The mmu will still have to handle writing to Krypton
 and other things like the UART master and timer, but that's alright.
 
 # Memory
