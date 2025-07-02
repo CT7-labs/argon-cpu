@@ -29,15 +29,36 @@ module Memory (
 
     initial begin
         // Memory initialization
-        // Left blank intentionally for now
+        
+        reg [31:0] test1 [0:4];
+
+        test1[0] <= 32'h0508FF00; // 0x00: ori r1, zero, 0xFF
+        test1[1] <= 32'h0510FFFF; // 0x04: ori r2, zero, 0xFFFF
+        test1[2] <= 32'h81101022; // 0x08: sll r2, r2, 16
+        test1[3] <= 32'h41184200; // 0x0C: add r3, r1, r2
+        test1[4] <= 32'h0AF8AAAA; // 0x10: lui r31, 0xAAAA
+
+        for (integer i = 0; i < 5; i = i + 1) begin
+            mem0[i] <= test1[i][31:24];
+            mem1[i] <= test1[i][23:16];
+            mem2[i] <= test1[i][15:8];
+            mem3[i] <= test1[i][7:0];
+        end
     end
+
+    logic [31:0] debug [0:4];
+    generate
+        genvar i;
+        for (i = 0; i < 5; i = i + 1) begin
+            assign debug[i][31:24] = mem3[i];
+            assign debug[i][23:16] = mem2[i];
+            assign debug[i][15:8] = mem1[i];
+            assign debug[i][7:0] = mem0[i];
+        end
+    endgenerate 
 
     logic [9:0] w_address; // 9-bit address for now
     assign w_address = i_address[11:2];
-
-    assign debug_mem0 = {mem0[0], mem1[0], mem2[0], mem3[0]};
-    assign debug_mem1 = {mem0[1], mem1[1], mem2[1], mem3[1]};
-    assign debug_mem2 = {mem0[2], mem1[2], mem2[2], mem3[2]};
 
     always @(posedge i_clk) begin
         // Base error state

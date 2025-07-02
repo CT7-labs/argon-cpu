@@ -10,8 +10,11 @@ module ArgonTB (
         .i_reset(i_reset),
 
         // Memory control port
-        
-
+        .o_mem_addr(w_mem_address),
+        .i_mem_rd_data(w_mem_rd_data),
+        .o_mem_rd_mask(w_mem_rd_mask),
+        .o_mem_wr_data(w_mem_wr_data),
+        .o_mem_wr_mask(w_mem_wr_mask)
     );
 
     logic [31:0] w_mem_address, w_mem_wr_data, w_mem_rd_data;
@@ -20,7 +23,7 @@ module ArgonTB (
     logic w_mem_err_address_misaligned, w_mem_err_invalid_read_mask;
 
     Memory memory_inst (
-        .i_clk(i_clk),
+        .i_clk(i_clk & ~i_halt),
         .i_reset(i_reset),
         
         .i_address(w_mem_address),
@@ -29,7 +32,7 @@ module ArgonTB (
         .i_wr_mask(w_mem_wr_mask),
 
         // read port
-        .i_rd_data(w_mem_rd_data),
+        .o_rd_data(w_mem_rd_data),
         .i_rd_mask(w_mem_rd_mask),
 
         // error port
