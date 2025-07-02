@@ -57,47 +57,6 @@ std::string to_binary(uint32_t value) {
     return bin;
 }
 
-void write_word(int addr, int data) {
-    top->i_wr_mask = 3;
-    top->i_address = addr;
-    top->i_wr_data = data & 0xFFFFFFFF;
-    simClock();
-}
-
-void write_half(int addr, int data) {
-    top->i_wr_mask = 2;
-    top->i_address = addr;
-    top->i_wr_data = data & 0xFFFFFFFF;
-    simClock();
-}
-
-void write_byte(int addr, int data) {
-    top->i_wr_mask = 1;
-    top->i_address = addr;
-    top->i_wr_data = data & 0xFFFFFFFF;
-    simClock();
-}
-
-void write_nothing(int addr, int data = 0xAAFFAAFF) {
-    top->i_wr_mask = 0;
-    top->i_address = addr;
-    top->i_wr_data = data; // If the address is overwritten with this, something is wrong
-    simClock();
-}
-
-void print_mem(int addr) {
-    printf("0x%08x\n", top->o_rd_data);
-}
-
-void read_mem(int addr, int mask) {
-    top->i_wr_mask = 0;
-    top->i_address = addr;
-    top->i_wr_data = 0;
-    top->i_rd_mask = mask;
-    simClock(2); // 1 for address delay, 1 for latching output
-    printf("0x%08x\n", top->o_rd_data);
-}
-
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
     top = new VArgonTB; // Instantiate the top module
@@ -119,7 +78,13 @@ int main(int argc, char** argv) {
     simreset();
 
     // Simulation
-
+    simClock(2); // initial instruction load
+    for (int i = 0; i < 5; i++) {
+        top->i_halt = 1;
+        simClock(1);
+        top->i_halt = 0;
+        simClock(5); // instruction
+    }
 
     // Cleanup
     std::cout << "Simulation complete, clock cycles: " << clock_count << "\n";
