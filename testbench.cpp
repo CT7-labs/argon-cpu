@@ -75,16 +75,15 @@ int main(int argc, char** argv) {
     std::cout << "Tracing initialized, writing to dump.fst\n";
 
     std::cout << "\n=== Simulation Begin ===\n";
-    simreset();
+    // simreset();
 
     // Simulation
     simClock(2); // initial instruction load
-    for (int i = 0; i < 5; i++) {
-        top->i_halt = 1;
-        simClock(1);
-        top->i_halt = 0;
+    for (int j = 0; j < 6; j++) {
         simClock(5); // instruction
     }
+
+    simClock();
 
     // Cleanup
     std::cout << "Simulation complete, clock cycles: " << clock_count << "\n";

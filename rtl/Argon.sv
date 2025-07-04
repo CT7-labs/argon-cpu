@@ -4,6 +4,7 @@ parameter STAGE_ID      = 1;
 parameter STAGE_EX      = 2;
 parameter STAGE_MEM     = 3;
 parameter STAGE_WB      = 4;
+parameter STAGE_FD      = 5; // fetch delay after a branch/jump
 
 // Writeback source constants
 parameter WBSRC_NONE        = 0;
@@ -19,8 +20,8 @@ module Argon (
     input wire i_halt,
     input wire i_reset,
 
-    input logic [31:0] i_mem_rd_data, o_mem_wr_data,
-    output logic [31:0] o_mem_addr,
+    input logic [31:0] i_mem_rd_data,
+    output logic [31:0] o_mem_addr, o_mem_wr_data,
     output logic [2:0] o_mem_rd_mask,
     output logic [1:0] o_mem_wr_mask
 );
@@ -64,7 +65,7 @@ module Argon (
 
     assign w_sign_ext_imm = {{16{w_imm16[15]}}, w_imm16};
     assign w_zero_ext_imm = {16'b0, w_imm16};
-    assign w_lui_imm = w_imm16 << 16; // 32-bit immediate for loading into registers
+    assign w_lui_imm = {w_imm16, 16'h0000}; // 32-bit immediate for loading into registers
     assign w_branch_offset = {{14{w_imm16[13]}}, w_imm16, 2'b00}; // 32-bit offset immediate for branching
     assign w_jtarg26  = r_instruction[31:6];   // 26-bit jump target
     assign w_jump_target = {r_pc[31:28], w_jtarg26, 2'b0}; // 32-bit jump address
@@ -109,7 +110,8 @@ module Argon (
                 // Select register ports
                 r_registers_selectA <= w_rs;
                 r_registers_selectB <= w_rt;
-                r_registers_selectW <= w_rd;
+                if (w_opcode == 18) r_registers_selectW <= 27; // Return Address (ra)
+                else r_registers_selectW <= w_rd;
 
                 // PC increment
                 // new PC is latched to r_alu_result
@@ -143,7 +145,9 @@ module Argon (
                         default: r_debug_invalid_funct6 <= 1;
                     endcase
 
-                    r_wb_src <= WBSRC_ALU;
+                    if (w_funct6 < 16) r_wb_src <= WBSRC_ALU;
+                    else r_wb_src <= WBSRC_NONE;
+
                 end else if (w_opcode >= 2 && w_opcode <= 10) begin // Immediate ALU opcodes
                     r_alu_wordA <= r_registers_portA;
                     r_alu_wordB <= w_zero_ext_imm;
@@ -167,6 +171,17 @@ module Argon (
                 end else if (w_opcode >= 11 && w_opcode <= 16) begin
                     // handle load/store opcodes
 
+                    o_mem_addr <= r_registers_portA;
+                    o_mem_wr_data <= r_registers_portB;
+                    case (w_opcode)
+                        6'h14: o_mem_wr_mask <= WRMASK_W;
+                        6'h15: o_mem_wr_mask <= WRMASK_H;
+                        6'h16: o_mem_wr_mask <= WRMASK_B;
+                        default: o_mem_wr_mask <= WRMASK_N;
+                    endcase
+
+                    r_wb_src <= WBSRC_NONE;
+                end else if (w_opcode == 17 || w_opcode == 18) begin
                     r_wb_src <= WBSRC_NONE;
                 end else begin
                     r_debug_invalid_opcode <= 1;
@@ -175,23 +190,51 @@ module Argon (
                 end
 
                 // PC increment
-                r_pc <= r_alu_result;
+                if (w_opcode == 17) begin
+                    $display("test", w_jump_target >> 2);
+                    r_pc <= w_jump_target;
+                end if (w_opcode == 18) begin
+                    r_registers_portW <= r_pc;
+                    r_registers_write_en <= 1;
+                    r_pc <= w_jump_target;
+                end else begin
+                   r_pc <= r_alu_result;
+                end
             
             end else if (r_stage == STAGE_MEM) begin // ============ memory
                 r_stage <= STAGE_WB;
 
                 // ALU output is latched
+                case (w_opcode)
+                    6'h11: o_mem_rd_mask <= RDMASK_W;
+                    6'h12: o_mem_rd_mask <= RDMASK_HE;
+                    6'h13: o_mem_rd_mask <= RDMASK_BE;
+                    default: o_mem_rd_mask <= RDMASK_XX;
+                endcase
+
+                if (w_opcode == 18) begin
+                    r_registers_write_en <= 0;
+                end
 
                 // instruction fetch
                 o_mem_addr <= r_pc;
+                $display(r_pc);
             end else if (r_stage == STAGE_WB) begin // ============= writeback
                 r_stage <= STAGE_IF;
-                r_wb_src <= WBSRC_NONE;
 
                 // ALU output has been written to register file
                 case (r_wb_src)
                     WBSRC_NONE: begin
-                        
+                        if (w_opcode == 1 && w_funct6 == 6'd16) begin // jmpr mnemonic
+                            o_mem_addr <= r_registers_portA;
+                        end else if (w_opcode == 1 && w_funct6 == 6'd17) begin //jalr mnemonic
+                            o_mem_addr <= r_registers_portA;
+                            r_registers_portW <= r_pc;
+                            r_registers_write_en <= 1; // yes, definitely confusing given it's location
+                            r_stage <= STAGE_FD;
+                        end else if (w_opcode == 17 || w_opcode == 18) begin
+                            // jmp and jal mnemonics
+                        end
                     end
                     WBSRC_ALU: begin
                         r_registers_portW <= r_alu_result;
@@ -206,7 +249,13 @@ module Argon (
                     end
                 endcase
 
+                r_wb_src <= WBSRC_NONE; // we're done writing
+
                 // instruction fetch
+                o_mem_rd_mask <= RDMASK_W;
+            end else if (r_stage == STAGE_FD) begin
+                r_stage <= STAGE_IF;
+
                 o_mem_rd_mask <= RDMASK_W;
             end
         end

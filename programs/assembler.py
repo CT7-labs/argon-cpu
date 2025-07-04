@@ -1,10 +1,6 @@
 from assembler_settings import *
 from assembly_exceptions import *
 
-testfile_dir = "programs/test1.asm"
-with open(testfile_dir, 'r') as testfile:
-    text = testfile.read()
-
 def get_value(text):
     if text[:2] == "0x":
         return int(text[2:], 16)
@@ -311,7 +307,7 @@ def parse_blobs(blobs):
     for b in blobs:
         mnemonic = b[0].value
         if mnemonic[-1] != ":" and len(b) - 1 != mnemonics[mnemonic]:
-            raise IHonestlyDontKnowBoss("incorrect number of arguments")
+            raise IHonestlyDontKnowBoss(mnemonic, "incorrect number of arguments")
     
     # define symbols
     for b in blobs:
@@ -392,7 +388,8 @@ def get_itype_bytes(op, rd, rs, imm16):
 
 def get_jtype_bytes(op, offset26):
     result = ((op & 0b111111) |
-               offset26 & 0x3ffffff << 6)
+               (offset26 & 0x3ffffff) << 6)
+    print(op, offset26, "to:", hex(result))
     assert result < 2 ** 32
     return result.to_bytes(4, byteorder="little")
 
@@ -455,6 +452,8 @@ def procedures_to_bytecode(procedures):
                     bi = procedures[p].index(b)
                     procedures[p][bi][ti] = Token(IMMEDIATE, indexes[t.value])
 
+    print(procedures)
+
     # add procedures to bytearray
     bytecode = bytearray()
     for p in procedures:
@@ -485,6 +484,11 @@ def print_bytecode(bytecode, printtype):
             rs = """
         print(get_instruction_bits(instruction)) if printtype == "bits" else print(get_instruction_hex(instruction))
         i += 4
+
+#testfile_dir = "programs/test1.asm"
+testfile_dir = "programs/test2.asm"
+with open(testfile_dir, 'r') as testfile:
+    text = testfile.read()
 
 blocks = raw_to_blocks(text)
 tokens = tokenize_blocks(blocks)

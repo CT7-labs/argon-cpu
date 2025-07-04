@@ -8,7 +8,7 @@ parameter RDMASK_HZ = 1; // Zero ext. Half read
 parameter RDMASK_BZ = 2; // Zero ext. Byte read
 parameter RDMASK_HE = 3; // Sign ext. half read
 parameter RDMASK_BE = 4; // Sign ext. byte read
-
+parameter RDMASK_XX = 5; // No read
 
 module Memory (
     input wire i_clk,
@@ -32,11 +32,11 @@ module Memory (
         
         reg [31:0] test1 [0:4];
 
-        test1[0] <= 32'h0508FF00; // 0x00: ori r1, zero, 0xFF
-        test1[1] <= 32'h0510FFFF; // 0x04: ori r2, zero, 0xFFFF
-        test1[2] <= 32'h81101022; // 0x08: sll r2, r2, 16
-        test1[3] <= 32'h41184200; // 0x0C: add r3, r1, r2
-        test1[4] <= 32'h0AF8AAAA; // 0x10: lui r31, 0xAAAA
+        test1[0] <= 32'h05101111; // 0x00: lui r1, 0x1111
+        test1[1] <= 32'h05182222; // 0x04: jmp 0x0C
+        test1[2] <= 32'h05203333; // 0x08: ori r1, r1, 0x1234
+        test1[3] <= 32'h05284444; // 0x0C: lui r1, 0xFFFF
+        test1[4] <= 32'h05305555; // 0x10: ori r1, r1, 0xFFFF
 
         for (integer i = 0; i < 5; i = i + 1) begin
             mem0[i] <= test1[i][31:24];
@@ -92,6 +92,8 @@ module Memory (
                 2'b10: o_rd_data <= {{24{mem2[w_address][7]}}, mem2[w_address]};
                 2'b11: o_rd_data <= {{24{mem3[w_address][7]}}, mem3[w_address]};
             endcase
+        end else if (i_rd_mask == RDMASK_XX) begin
+            // Intended functionality
         end else begin
             o_err_invalid_read_mask <= 1;
         end
