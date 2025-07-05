@@ -240,8 +240,8 @@ module Argon (
     // ALU input multiplexing
     always_comb begin
         case (mux_alu_srcA)
-            ALU_SRC_A_REG:  w_alu_wordA = r_pc;
-            ALU_SRC_A_PC:   w_alu_wordB = w_registers_portA;
+            ALU_SRC_A_REG:  w_alu_wordA = w_registers_portA;
+            ALU_SRC_A_PC:   w_alu_wordA = r_pc;
         endcase
 
         case (mux_alu_srcB)
