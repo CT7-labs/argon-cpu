@@ -32,11 +32,11 @@ module Memory (
         
         reg [31:0] test1 [0:4];
 
-        test1[0] <= 32'h05101111; // 0x00: lui r1, 0x1111
-        test1[1] <= 32'h05182222; // 0x04: jmp 0x0C
-        test1[2] <= 32'h05203333; // 0x08: ori r1, r1, 0x1234
-        test1[3] <= 32'h05284444; // 0x0C: lui r1, 0xFFFF
-        test1[4] <= 32'h05305555; // 0x10: ori r1, r1, 0xFFFF
+        test1[0] <= 32'h02402A00; // 0x00: ADDI r8, r0, 42
+        test1[1] <= 32'h014A0801; // 0x04: ADD r9, r8, r8
+        test1[2] <= 32'h44520F00; // 0x08: ANDI r10, r9, 0x0F
+        test1[3] <= 32'h014A4A0D; // 0x0C: OR r9, r8, r10
+        test1[4] <= 32'h41524A05; // 0x10: SUB r10, r9, r10
 
         for (integer i = 0; i < 5; i = i + 1) begin
             mem0[i] <= test1[i][31:24];

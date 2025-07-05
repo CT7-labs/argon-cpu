@@ -291,7 +291,11 @@ def tokens_to_blobs(tokens):
     scratch = []
     for tok in tokens:
         if tok.token != ENDL:
-            scratch.append(tok)
+            if len(scratch) == 0:
+                tok.lower()
+                scratch.append(tok)
+            else:
+                scratch.append(tok)
         else:
             blobs.append(scratch)
             scratch = []

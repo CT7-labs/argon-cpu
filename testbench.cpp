@@ -78,12 +78,10 @@ int main(int argc, char** argv) {
     // simreset();
 
     // Simulation
-    simClock(2); // initial instruction load
-    for (int j = 0; j < 6; j++) {
+    simClock(1); // initial instruction load
+    for (int j = 0; j < 5; j++) {
         simClock(5); // instruction
     }
-
-    simClock();
 
     // Cleanup
     std::cout << "Simulation complete, clock cycles: " << clock_count << "\n";

@@ -40,6 +40,8 @@ class Token:
         self.value = value # register, immediate, etc.
         self.line = line # line number
         self.size = size # size in bytes
+    def lower(self):
+        self.value = self.value.lower()
     def __repr__(self):
         out = ""
         if self.token[0:1] != "$":

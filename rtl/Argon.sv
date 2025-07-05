@@ -83,7 +83,7 @@ module Argon (
 
     // assignments
     logic r_mux_mem_addr;
-    assign o_mem_addr == (r_mux_mem_addr == 0) ? r_pc : w_alu_result
+    assign o_mem_addr = (r_mux_mem_addr == 0) ? r_pc : r_alu_result;
 
     always_ff @(posedge sys_clk or posedge i_reset) begin
         // debug defaults
@@ -163,8 +163,6 @@ module Argon (
         if (r_stage == STAGE_EX) begin
             // ALU output is valid now
             r_alu_result <= w_alu_output;
-
-            // Setup for latching new PC
             r_alu_opcode <= ALUOP_ADD;
             mux_alu_srcA <= ALU_SRC_A_PC;
             mux_alu_srcB <= ALU_SRC_B_PC_INC;
@@ -176,6 +174,8 @@ module Argon (
         if (r_stage == STAGE_MEM) begin
             // instruction fetch
             r_mux_mem_addr <= 0; // select PC as memory address source
+
+            // Setup for latching new PC
             r_pc <= w_alu_output;
 
             // setup for writeback stage
@@ -201,7 +201,7 @@ module Argon (
     logic r_registers_write_en;
     logic [4:0] w_registers_selectA, w_registers_selectB, w_registers_selectW;
     logic [31:0] w_registers_portA, w_registers_portB, w_registers_portW;
-    logic [31:0] r_alu_result // intermediate for storing result while computing next PC
+    logic [31:0] r_alu_result; // intermediate for storing result while computing next PC
 
     assign w_registers_selectA = w_rs;
     assign w_registers_selectB = w_rt;
@@ -210,7 +210,7 @@ module Argon (
     always_comb begin
         case (mux_wb_src)
             WB_SRC_NONE:    w_registers_portW = 32'h00000000;
-            WB_SRC_ALU:     w_registers_portW = w_alu_result;
+            WB_SRC_ALU:     w_registers_portW = r_alu_result;
             WB_SRC_LUI:     w_registers_portW = w_lui_imm;
             WB_SRC_MEM:     w_registers_portW = i_mem_rd_data;
         endcase
@@ -246,7 +246,7 @@ module Argon (
 
         case (mux_alu_srcB)
             ALU_SRC_B_REG:      w_alu_wordB = w_registers_portB;
-            ALU_SRC_B_IMM16:    w_alu_wordB = (mux_imm16) ? w_zero_ext_imm : w_sign_ext_imm;
+            ALU_SRC_B_IMM16:    w_alu_wordB = (mux_imm16) ? w_sign_ext_imm : w_zero_ext_imm;
             ALU_SRC_B_BRANCH:   w_alu_wordB = w_branch_offset;
         endcase
     end
