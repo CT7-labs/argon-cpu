@@ -1,0 +1,5 @@
+make everything combinational in the circuit. this means:
+- ALU inputs are selected by a mux
+- memory address is selected by a mux
+- register ports are selected by a mux
+- EVERYTHING IS MUXED
