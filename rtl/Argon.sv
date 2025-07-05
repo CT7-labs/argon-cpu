@@ -27,6 +27,8 @@ parameter IMM16_SIGN_EXT    = 1;
 // Register Read Constants
 parameter RT_MUX_RT = 0;
 parameter RT_MUX_RD = 1;
+parameter RD_MUX_RD = 0;
+parameter RD_MUX_RA = 1;
 
 // Boot defaults
 parameter BOOT_INITIAL_STAGE = STAGE_WB;
@@ -61,11 +63,11 @@ module Argon (
     logic [4:0] w_rs, w_rd, w_rt, w_shamt;
     logic [15:0] w_imm16;
     logic [1:0] mux_wb_src;
-    logic mux_rt;
+    logic mux_rt, mux_rd;
 
     assign w_opcode = r_instruction[5:0];       // instruction opcode
     assign w_rs     = r_instruction[10:6];      // source register A
-    assign w_rd     = r_instruction[15:11];     // dest. register
+    assign w_rd     = (~mux_rd) ? r_instruction[15:11] : 5'd27; // dest. register (5'd27 is ra register)
     assign w_rt     = (~mux_rt) ? r_instruction[20:16] : r_instruction[15:11]; // source register B
     assign w_shamt  = r_instruction[25:21];     // shift amount
     assign w_funct6 = r_instruction[31:26];     // 6-bit function
@@ -103,6 +105,7 @@ module Argon (
         if (r_stage == STAGE_ID) begin
             // ALU opcodes
             mux_rt <= RT_MUX_RT;
+            mux_rd <= RD_MUX_RD;
             if (w_opcode == 0) begin
                 
             end else if (w_opcode == 1 && w_funct6 < 16) begin
@@ -162,6 +165,12 @@ module Argon (
             end else if (w_opcode == 10) begin
                 // lui
                 mux_wb_src <= WB_SRC_LUI;
+            end else if (w_opcode == 18) begin
+                // jal
+                mux_wb_src <= WB_SRC_ALU;
+                mux_rd <= RD_MUX_RA;
+                mux_alu_srcA <= ALU_SRC_A_PC;
+                mux_alu_srcB <= ALU_SRC_B_PC_INC;
             end
             
             // setup for execute stage
@@ -187,7 +196,9 @@ module Argon (
             r_mux_mem_addr <= 0; // select PC as memory address source
 
             // Setup for latching new PC
-            r_pc <= w_alu_output;
+            if (w_opcode == 17) r_pc <= w_jump_target;
+            else if (w_opcode == 18) r_pc <= w_jump_target;
+            else r_pc <= w_alu_output;
 
             // setup for writeback stage
             r_stage <= STAGE_WB;

@@ -1,7 +1,9 @@
 .section CODE
 .main:
-    beq r0, r0, .test
+    jmp .test
     lui r1, 0xFFFF
 
 .test:
     lui r1, 0xAAAA
+    jal .main
+    lui r1, 0xFFFF
