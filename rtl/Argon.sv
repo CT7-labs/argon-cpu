@@ -24,6 +24,10 @@ parameter ALU_SRC_B_BRANCH  = 3;
 parameter IMM16_ZERO_EXT    = 0;
 parameter IMM16_SIGN_EXT    = 1;
 
+// Register Read Constants
+parameter RT_MUX_RT = 0;
+parameter RT_MUX_RD = 1;
+
 // Boot defaults
 parameter BOOT_INITIAL_STAGE = STAGE_WB;
 
@@ -57,11 +61,12 @@ module Argon (
     logic [4:0] w_rs, w_rd, w_rt, w_shamt;
     logic [15:0] w_imm16;
     logic [1:0] mux_wb_src;
+    logic mux_rt;
 
     assign w_opcode = r_instruction[5:0];       // instruction opcode
     assign w_rs     = r_instruction[10:6];      // source register A
     assign w_rd     = r_instruction[15:11];     // dest. register
-    assign w_rt     = r_instruction[20:16];     // source register B
+    assign w_rt     = (~mux_rt) ? r_instruction[20:16] : r_instruction[15:11]; // source register B
     assign w_shamt  = r_instruction[25:21];     // shift amount
     assign w_funct6 = r_instruction[31:26];     // 6-bit function
     assign w_imm16  = r_instruction[31:16];     // 16-bit immediate
@@ -97,6 +102,7 @@ module Argon (
 
         if (r_stage == STAGE_ID) begin
             // ALU opcodes
+            mux_rt <= RT_MUX_RT;
             if (w_opcode == 0) begin
                 
             end else if (w_opcode == 1 && w_funct6 < 16) begin
@@ -150,6 +156,8 @@ module Argon (
             end else if (w_opcode < 10) begin
                 // BEQ and BNE
                 mux_wb_src <= WB_SRC_NONE;
+                mux_rt <= RT_MUX_RD;
+                r_alu_opcode <= ALUOP_ADD; // Don't care
 
             end else if (w_opcode == 10) begin
                 // lui
@@ -165,7 +173,10 @@ module Argon (
             r_alu_result <= w_alu_output;
             r_alu_opcode <= ALUOP_ADD;
             mux_alu_srcA <= ALU_SRC_A_PC;
-            mux_alu_srcB <= ALU_SRC_B_PC_INC;
+
+            if (w_opcode == 8 && w_alu_flag_equal) mux_alu_srcB <= ALU_SRC_B_BRANCH;
+            else if (w_opcode == 9 && w_alu_flag_notequal) mux_alu_srcB <= ALU_SRC_B_BRANCH;
+            else mux_alu_srcB <= ALU_SRC_B_PC_INC;
             
             // setup for memory stage
             r_stage <= STAGE_MEM;
