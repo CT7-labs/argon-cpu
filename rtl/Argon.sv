@@ -247,6 +247,7 @@ module Argon (
         case (mux_alu_srcB)
             ALU_SRC_B_REG:      w_alu_wordB = w_registers_portB;
             ALU_SRC_B_IMM16:    w_alu_wordB = (mux_imm16) ? w_sign_ext_imm : w_zero_ext_imm;
+            ALU_SRC_B_PC_INC:   w_alu_wordB = w_pc_inc;
             ALU_SRC_B_BRANCH:   w_alu_wordB = w_branch_offset;
         endcase
     end
