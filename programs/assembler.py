@@ -434,7 +434,7 @@ def procedures_to_bytecode(procedures):
     # get indexes of all procedures
     lengths = {}
     for p in procedures:
-        lengths[p] = len(procedures[p]) * 4
+        lengths[p] = len(procedures[p])
     
     length = 0
     for l in lengths:
