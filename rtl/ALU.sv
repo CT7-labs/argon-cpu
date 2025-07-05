@@ -25,7 +25,7 @@ module ALU (
     input logic [31:0]   i_wordA,
     input logic [31:0]   i_wordB,
     input logic [4:0]    i_shamt,
-    output logic [31:0]  o_result,
+    output logic [31:0]  o_output,
 
     output logic o_flag_equal,
     output logic o_flag_notequal
@@ -36,22 +36,22 @@ module ALU (
         debug_invalid_opcode = 0;
 
         case (i_opcode)
-            ALUOP_ADD:      o_result = i_wordA + i_wordB;
-            ALUOP_SUB:      o_result = i_wordA - i_wordB;
-            ALUOP_AND:      o_result = i_wordA & i_wordB;
-            ALUOP_OR:       o_result = i_wordA | i_wordB;
-            ALUOP_NOR:      o_result = ~(i_wordA | i_wordB);
-            ALUOP_XOR:      o_result = i_wordA ^ i_wordB;
-            ALUOP_SLL:      o_result = i_wordA << i_shamt; // SLL == SLA
-            ALUOP_SRL:      o_result = i_wordA >> i_shamt;
-            ALUOP_SRA:      o_result = i_wordA >>> i_shamt;
-            ALUOP_SLT:      o_result = {31'b0, ($signed(i_wordA) < $signed(i_wordB))};
-            ALUOP_SLTU:     o_result = {31'b0, (i_wordA < i_wordB)};
-            ALUOP_SETB:     o_result = i_wordA | (1 << i_shamt);
-            ALUOP_CLRB:     o_result = i_wordA & ~(1 << i_shamt);
-            ALUOP_SLLV:     o_result = i_wordA << i_wordB[4:0];
-            ALUOP_SRLV:     o_result = i_wordA >> i_wordB[4:0];
-            ALUOP_SRAV:     o_result = i_wordA >>> i_wordB[4:0];
+            ALUOP_ADD:      o_output = i_wordA + i_wordB;
+            ALUOP_SUB:      o_output = i_wordA - i_wordB;
+            ALUOP_AND:      o_output = i_wordA & i_wordB;
+            ALUOP_OR:       o_output = i_wordA | i_wordB;
+            ALUOP_NOR:      o_output = ~(i_wordA | i_wordB);
+            ALUOP_XOR:      o_output = i_wordA ^ i_wordB;
+            ALUOP_SLL:      o_output = i_wordA << i_shamt; // SLL == SLA
+            ALUOP_SRL:      o_output = i_wordA >> i_shamt;
+            ALUOP_SRA:      o_output = i_wordA >>> i_shamt;
+            ALUOP_SLT:      o_output = {31'b0, ($signed(i_wordA) < $signed(i_wordB))};
+            ALUOP_SLTU:     o_output = {31'b0, (i_wordA < i_wordB)};
+            ALUOP_SETB:     o_output = i_wordA | (1 << i_shamt);
+            ALUOP_CLRB:     o_output = i_wordA & ~(1 << i_shamt);
+            ALUOP_SLLV:     o_output = i_wordA << i_wordB[4:0];
+            ALUOP_SRLV:     o_output = i_wordA >> i_wordB[4:0];
+            ALUOP_SRAV:     o_output = i_wordA >>> i_wordB[4:0];
         endcase
 
         o_flag_equal = i_wordA == i_wordB;

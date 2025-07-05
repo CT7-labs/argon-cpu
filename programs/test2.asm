@@ -1,7 +1,7 @@
 .section CODE
 .main:
-    lui r2, 0x1111
-    ori r3, r0, 0x2222
-    ori r4, r0, 0x3333
-    ori r5, r0, 0x4444
-    ori r6, r0, 0x5555
+    ADDI r8, r0, 42
+    ADD r9, r8, r8
+    ANDI r10, r9, 0x0F
+    OR r9, r8, r10
+    SUB r10, r9, r10
