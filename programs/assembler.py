@@ -402,9 +402,13 @@ def blob_to_bytecode(blob):
     if mnemonic in rtype_mnemonics:
         op = 1
         rd = blob[1].value
-        rs = blob[2].value
-        rt = blob[3].value
-        shamt = blob[3].value # yes this means shamt will have nonzero values even if it's not being used :/
+        rs = 0
+        rt = 0
+        shamt = 0
+        if len(blob) == 4:
+            rs = blob[2].value
+            rt = blob[3].value
+            shamt = blob[3].value # yes this means shamt will have nonzero values even if it's not being used :/
         funct = rtype_mnemonics.index(mnemonic)
 
         return get_rtype_bytes(op, rd, rs, rt, shamt, funct)

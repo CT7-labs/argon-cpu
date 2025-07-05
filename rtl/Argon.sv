@@ -132,6 +132,10 @@ module Argon (
                     6'hE: r_alu_opcode <= ALUOP_SLT;
                     6'hF: r_alu_opcode <= ALUOP_SLTU;
                 endcase
+            end else if (w_opcode == 1 && w_funct6 == 16) begin
+                mux_alu_srcA <= ALU_SRC_A_REG;
+                mux_alu_srcB <= ALU_SRC_B_REG;
+                mux_wb_src <= WB_SRC_NONE;
             end else if (w_opcode < 4) begin
                 // immediate arithmetic
                 mux_alu_srcA <= ALU_SRC_A_REG;
@@ -198,6 +202,7 @@ module Argon (
             // Setup for latching new PC
             if (w_opcode == 17) r_pc <= w_jump_target;
             else if (w_opcode == 18) r_pc <= w_jump_target;
+            else if (w_opcode == 1 && w_funct6 == 16) r_pc <= w_registers_portA;
             else r_pc <= w_alu_output;
 
             // setup for writeback stage

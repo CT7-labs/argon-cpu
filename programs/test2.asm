@@ -1,9 +1,7 @@
 .section CODE
 .main:
-    jmp .test
+    jmpr r1
     lui r1, 0xFFFF
-
-.test:
-    lui r1, 0xAAAA
-    jal .main
-    lui r1, 0xFFFF
+    lui r2, 0xFFFF
+    lui r3, 0xFFFF
+    lui r4, 0xFFFF
