@@ -42,15 +42,15 @@
 | 5     | `ori`             | `rd` = `rs` \| `imm16`        |
 | 6     | `nori`            | `rd` = ~(`rs` \| `imm16`)     |
 | 7     | `xori`            | `rd` = `rs` ^ `imm16`         |
-| 8     | `beq`*             | if `rs` == `rt`: `pc` += `imm16` |
-| 9     | `bne`*             | if `rs` != `rt`: `pc` += `imm16` |
-| 10     | `lui`             | `rd[31:16]` = `imm16` |
-| 11    | `lw`*              | `rd` = `mem[rs+imm16]` |
-| 12    | `lh`*              | `rd[15:0]` = `mem[rs+imm16]` |
-| 13    | `lb`*              | `rd[7:0]` = `mem[rs+imm16]` |
-| 14   | `sw`*              | `mem[rs+imm16]` = `rt` |
-| 15    | `sh`*              | `mem[rs+imm16]` = `rt` |
-| 16    | `sb`*              | `mem[rs+imm16]` = `rt` |
+| 8     | `beq`*            | if `rs` == `rt`: `pc` += `imm16` |
+| 9     | `bne`*            | if `rs` != `rt`: `pc` += `imm16` |
+| 10    | `lui`             | `rd[31:16]` = `imm16` |
+| 11    | `lw`*             | `rd` = `mem[rs+imm16]` |
+| 12    | `lh`*             | `rd[15:0]` = `mem[rs+imm16]` |
+| 13    | `lb`*             | `rd[7:0]` = `mem[rs+imm16]` |
+| 14    | `sw`*             | `mem[rs+imm16]` = `rt` |
+| 15    | `sh`*             | `mem[rs+imm16]` = `rt` |
+| 16    | `sb`*             | `mem[rs+imm16]` = `rt` |
 
 # J-type
     There's only 2 J-type instructions that Argon can execute.
