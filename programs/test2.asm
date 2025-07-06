@@ -1,7 +1,6 @@
 .section CODE
 .main:
-    jmpr r1
-    lui r1, 0xFFFF
-    lui r2, 0xFFFF
-    lui r3, 0xFFFF
-    lui r4, 0xFFFF
+    lui r2, 0x1234
+    ori r2, r2, 0x5678
+    sw r2, r0, 0x8
+    

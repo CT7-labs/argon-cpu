@@ -30,6 +30,10 @@ parameter RT_MUX_RD = 1;
 parameter RD_MUX_RD = 0;
 parameter RD_MUX_RA = 1;
 
+// Memory Address Source
+parameter MEM_ADDR_SRC_PC   = 0;
+parameter MEM_ADDR_SRC_ALU  = 1;
+
 // Boot defaults
 parameter BOOT_INITIAL_STAGE = STAGE_WB;
 
@@ -133,8 +137,14 @@ module Argon (
                     6'hF: r_alu_opcode <= ALUOP_SLTU;
                 endcase
             end else if (w_opcode == 1 && w_funct6 == 16) begin
+                // jmpr
                 mux_alu_srcA <= ALU_SRC_A_REG;
-                mux_alu_srcB <= ALU_SRC_B_REG;
+                mux_alu_srcB <= 0;
+                mux_wb_src <= WB_SRC_NONE;
+            end else if (w_opcode == 1 && w_funct6 == 16) begin
+                // jalr
+                mux_alu_srcA <= ALU_SRC_A_REG;
+                mux_alu_srcB <= 0;
                 mux_wb_src <= WB_SRC_NONE;
             end else if (w_opcode < 4) begin
                 // immediate arithmetic
@@ -169,6 +179,23 @@ module Argon (
             end else if (w_opcode == 10) begin
                 // lui
                 mux_wb_src <= WB_SRC_LUI;
+            end else if (w_opcode >= 11 && w_opcode <= 13) begin
+                // lw, lh, lb respectively
+                mux_wb_src <= WB_SRC_MEM;
+                mux_alu_srcA <= ALU_SRC_A_REG;
+                mux_alu_srcB <= ALU_SRC_B_IMM16;
+                mux_imm16 <= IMM16_SIGN_EXT;
+                r_alu_opcode <= ALUOP_ADD;
+                r_mux_mem_addr <= MEM_ADDR_SRC_ALU;
+            end else if (w_opcode >= 14 && w_opcode <= 17) begin
+                // sw, sh, sb respectively
+                mux_rt <= RT_MUX_RD;
+                mux_alu_srcA <= ALU_SRC_A_REG;
+                mux_alu_srcB <= ALU_SRC_B_IMM16;
+                mux_imm16 <= IMM16_SIGN_EXT;
+                r_alu_opcode <= ALUOP_ADD;
+                r_mux_mem_addr <= MEM_ADDR_SRC_ALU;
+                mux_wb_src <= WB_SRC_NONE;
             end else if (w_opcode == 18) begin
                 // jal
                 mux_wb_src <= WB_SRC_ALU;
@@ -187,9 +214,27 @@ module Argon (
             r_alu_opcode <= ALUOP_ADD;
             mux_alu_srcA <= ALU_SRC_A_PC;
 
+            // memory access instruction
+            // address is latched from ALU
+            case (w_opcode)
+                11: o_mem_rd_mask <= RDMASK_W;
+                12: o_mem_rd_mask <= RDMASK_HZ;
+                13: o_mem_rd_mask <= RDMASK_BZ;
+                default: o_mem_rd_mask <= RDMASK_XX;
+            endcase
+
             if (w_opcode == 8 && w_alu_flag_equal) mux_alu_srcB <= ALU_SRC_B_BRANCH;
             else if (w_opcode == 9 && w_alu_flag_notequal) mux_alu_srcB <= ALU_SRC_B_BRANCH;
             else mux_alu_srcB <= ALU_SRC_B_PC_INC;
+
+            o_mem_wr_data <= w_registers_portB;
+
+            case (w_opcode)
+                14: o_mem_wr_mask <= WRMASK_W;
+                15: o_mem_wr_mask <= WRMASK_H;
+                16: o_mem_wr_mask <= WRMASK_B;
+                default: o_mem_wr_mask <= WRMASK_N;
+            endcase
             
             // setup for memory stage
             r_stage <= STAGE_MEM;
@@ -197,30 +242,32 @@ module Argon (
 
         if (r_stage == STAGE_MEM) begin
             // instruction fetch
-            r_mux_mem_addr <= 0; // select PC as memory address source
 
             // Setup for latching new PC
             if (w_opcode == 17) r_pc <= w_jump_target;
             else if (w_opcode == 18) r_pc <= w_jump_target;
-            else if (w_opcode == 1 && w_funct6 == 16) r_pc <= w_registers_portA;
+            else if (w_opcode == 1 && (w_funct6 == 16 || w_funct6 == 17)) r_pc <= w_registers_portA;
             else r_pc <= w_alu_output;
+
+            // Memory write finish
+            o_mem_wr_mask <= WRMASK_N;
 
             // setup for writeback stage
             r_stage <= STAGE_WB;
             if (mux_wb_src != WB_SRC_NONE) r_registers_write_en <= 1;
+            else if (w_opcode == 1 && w_funct6 == 16) r_registers_write_en <= 1; // jmpr: ra writeback
 
         end
         
         if (r_stage == STAGE_WB) begin
-            // instruction fetch
-            o_mem_rd_mask <= RDMASK_W; // read mask latched into memory
             // address is latched into memory
 
             // writeback is done sooo
             r_registers_write_en <= 0;
             
-            // next stage
+            // next instruction
             r_stage <= STAGE_IF;
+            o_mem_rd_mask <= RDMASK_W; // read mask latched into memory
         end
     end
 
@@ -236,7 +283,7 @@ module Argon (
     
     always_comb begin
         case (mux_wb_src)
-            WB_SRC_NONE:    w_registers_portW = 32'h00000000;
+            WB_SRC_NONE:    w_registers_portW = w_alu_output; // PC + 4 during WB stage
             WB_SRC_ALU:     w_registers_portW = r_alu_result;
             WB_SRC_LUI:     w_registers_portW = w_lui_imm;
             WB_SRC_MEM:     w_registers_portW = i_mem_rd_data;

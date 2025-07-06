@@ -405,6 +405,8 @@ def blob_to_bytecode(blob):
         rs = 0
         rt = 0
         shamt = 0
+        if len(blob) == 3:
+            rs = blob[2].value
         if len(blob) == 4:
             rs = blob[2].value
             rt = blob[3].value
