@@ -35,7 +35,7 @@ parameter MEM_ADDR_SRC_PC   = 0;
 parameter MEM_ADDR_SRC_ALU  = 1;
 
 // Boot defaults
-parameter BOOT_INITIAL_STAGE = STAGE_WB;
+parameter BOOT_INITIAL_STAGE = STAGE_EX;
 
 module Argon (
     input logic i_clk,
@@ -235,6 +235,8 @@ module Argon (
                 16: o_mem_wr_mask <= WRMASK_B;
                 default: o_mem_wr_mask <= WRMASK_N;
             endcase
+
+            
             
             // setup for memory stage
             r_stage <= STAGE_MEM;
@@ -242,6 +244,7 @@ module Argon (
 
         if (r_stage == STAGE_MEM) begin
             // instruction fetch
+            r_mux_mem_addr <= MEM_ADDR_SRC_PC; // select PC as memory address source
 
             // Setup for latching new PC
             if (w_opcode == 17) r_pc <= w_jump_target;

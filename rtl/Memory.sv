@@ -34,7 +34,7 @@ module Memory (
 
         test1[0] <= 32'h0A103412; // 0x00: jmpr r1
         test1[1] <= 32'h85107856; // 0x04: lui r1, 0xFFFF
-        test1[2] <= 32'h0E100800; // 0x08: lui r2, 0xFFFF
+        test1[2] <= 32'h10100900; // 0x08: lui r2, 0xFFFF
         test1[3] <= 32'h00000000; // 0x0C: lui r3, 0xFFFF
         test1[4] <= 32'h00000000; // 0x10: lui r4, 0xFFFF
 
