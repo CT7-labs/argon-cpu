@@ -7,7 +7,7 @@ SIM_OBJ = $(SIM_DIR)/$(OBJ_NAME)
 TRACE_FILE = dump.fst
 
 VERILATOR = verilator
-VERILATOR_FLAGS = -Wno-fatal --cc --exe --build -o $(OBJ_NAME) --trace-fst --public --vpi
+VERILATOR_FLAGS = -Wno-fatal --cc --exe --build -o $(OBJ_NAME) --trace-fst
 
 # this is a test
 
