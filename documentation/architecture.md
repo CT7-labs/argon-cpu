@@ -75,6 +75,7 @@ ddirb
 Reading from the PORTA register returns the value from the "read only" register, and writing to the PORTA register sets
 the value in "write only" register.
 
+*not implemented
 # Opcodes
 ### ALU arithmetic
 - ADD rd, rs, rt
@@ -121,8 +122,8 @@ the value in "write only" register.
 - LW rd, rs, imm16
 - LH rd, rs, imm16  // Sign-extends
 - LW rd, rs, imm16  // Sign-extends
-- LHU rd, rs, imm16 // Zero-extends
-- LBU rd, rs, imm16 // Zero-extends
+- *LHU rd, rs, imm16 // Zero-extends
+- *LBU rd, rs, imm16 // Zero-extends
 - SW rs, rt, imm16
 - SH rs, rt, imm16
 - SB rs, rt, imm16

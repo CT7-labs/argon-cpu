@@ -1,7 +1,8 @@
 module ArgonTB (
     input wire i_clk,
     input wire i_halt,
-    input wire i_reset
+    input wire i_reset,
+    output logic [31:0] debug_register_file [0:31]
 );
 
     Argon argon_inst (
@@ -39,5 +40,14 @@ module ArgonTB (
         .o_err_address_misaligned(w_mem_err_address_misaligned),
         .o_err_invalid_read_mask(w_mem_err_invalid_read_mask)
     );
+
+    // Debug output
+    generate
+        genvar i;
+        for (i = 0; i < 32; i = i + 1) begin
+            if (i == 0) assign debug_register_file[i] = 32'h0;
+            else assign debug_register_file[i] = argon_inst.registerfile_inst.file[i];
+        end
+    endgenerate
     
 endmodule

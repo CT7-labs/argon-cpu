@@ -47,6 +47,22 @@ void simreset() {
     std::cout << "Reset complete\n";
 }
 
+void dump_registers(int start, int stop) {
+    if (start < 0 || stop > 31 || start > stop) {
+        printf("Invalid range: start=%d, stop=%d\n", start, stop);
+        return;
+    }
+    const char* reg_names[] = {
+        "zero", "a0", "a1", "a2", "a3", "v0", "v1", "s0", "s1", "s2",
+        "s3", "s4", "s5", "s6", "s7", "t0", "t1", "t2", "t3", "t4",
+        "t5", "t6", "t7", "gp", "sp", "st", "is", "ra", "porta", "ddira",
+        "portb", "ddirb"
+    };
+    for (int j = start; j <= stop; j++) {
+        printf("%-6s: 0x%08x\n", reg_names[j], top->debug_register_file[j]);
+    }
+}
+
 // Helper function to format 32-bit value as binary with underscores
 std::string to_binary(uint32_t value) {
     std::string bin;
@@ -83,7 +99,8 @@ int main(int argc, char** argv) {
         simClock(5); // instruction
     }
 
-    printf(top->r_instruction);
+    dump_registers(0, 4);
+    
 
     // Cleanup
     std::cout << "Simulation complete, clock cycles: " << clock_count << "\n";

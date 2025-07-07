@@ -495,6 +495,22 @@ def print_bytecode(bytecode, printtype):
         print(get_instruction_bits(instruction)) if printtype == "bits" else print(get_instruction_hex(instruction))
         i += 4
 
+def save_padded_hex(input_data, output_file):
+    # Ensure input is a bytearray
+    if not isinstance(input_data, bytearray):
+        raise ValueError("Input must be a bytearray")
+    
+    # Pad to 4096 bytes with zeros
+    padded_data = input_data + bytearray(4096 - len(input_data))
+    
+    # Write to .hex file in Verilog $readmemh format
+    with open(output_file, 'w') as f:
+        for i in range(0, 4096, 4):  # Process 4 bytes (32-bit word) at a time
+            word = padded_data[i:i+4]
+            # Convert to little-endian hex (Verilog expects 32-bit words)
+            hex_word = f"{int.from_bytes(word, 'big'):08x}"
+            f.write(hex_word + '\n')
+
 #testfile_dir = "programs/test1.asm"
 testfile_dir = "programs/test2.asm"
 with open(testfile_dir, 'r') as testfile:
@@ -505,7 +521,4 @@ tokens = tokenize_blocks(blocks)
 blobs = tokens_to_blobs(tokens)
 procedures = parse_blobs(blobs)
 bytecode = procedures_to_bytecode(procedures)
-
-print_bytecode(bytecode, 'hex')
-print()
-print_bytecode(bytecode, 'bits')
+save_padded_hex(bytecode, "rtl/program.hex")

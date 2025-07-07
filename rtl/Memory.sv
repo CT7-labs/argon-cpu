@@ -30,19 +30,15 @@ module Memory (
     initial begin
         // Memory initialization
         
-        reg [31:0] test1 [0:4];
+        reg [31:0] prog [0:1023];
 
-        test1[0] <= 32'h0A103412; // 0x00: jmpr r1
-        test1[1] <= 32'h85107856; // 0x04: lui r1, 0xFFFF
-        test1[2] <= 32'h10100900; // 0x08: lui r2, 0xFFFF
-        test1[3] <= 32'h00000000; // 0x0C: lui r3, 0xFFFF
-        test1[4] <= 32'h00000000; // 0x10: lui r4, 0xFFFF
+        $readmemh("rtl/program.hex", prog);
 
-        for (integer i = 0; i < 5; i = i + 1) begin
-            mem0[i] <= test1[i][31:24];
-            mem1[i] <= test1[i][23:16];
-            mem2[i] <= test1[i][15:8];
-            mem3[i] <= test1[i][7:0];
+        for (integer i = 0; i < 1024; i = i + 1) begin
+            mem0[i] <= prog[i][31:24];
+            mem1[i] <= prog[i][23:16];
+            mem2[i] <= prog[i][15:8];
+            mem3[i] <= prog[i][7:0];
         end
     end
 
