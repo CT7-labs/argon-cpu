@@ -462,8 +462,6 @@ def procedures_to_bytecode(procedures):
                     bi = procedures[p].index(b)
                     procedures[p][bi][ti] = Token(IMMEDIATE, indexes[t.value])
 
-    print(procedures)
-
     # add procedures to bytearray
     bytecode = bytearray()
     for p in procedures:
