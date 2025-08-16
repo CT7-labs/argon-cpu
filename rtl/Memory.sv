@@ -30,11 +30,11 @@ module Memory (
     initial begin
         // Memory initialization
         
-        reg [31:0] test1 [0:5];
+        reg [31:0] test1 [0:1023];
 
-        $readmemh("rtl/test.o", test1);
+        $readmemh("rtl/counter.o", test1);
 
-        for (integer i = 0; i < 5; i = i + 1) begin
+        for (integer i = 0; i < 1023; i = i + 1) begin
             mem0[i] <= test1[i][31:24];
             mem1[i] <= test1[i][23:16];
             mem2[i] <= test1[i][15:8];
@@ -42,18 +42,21 @@ module Memory (
         end
     end
 
-    logic [31:0] debug [0:4];
+    /*
+    For debugging memory issues
+    logic [31:0] debug [0:5];
     generate
         genvar i;
-        for (i = 0; i < 5; i = i + 1) begin
+        for (i = 0; i < 6; i = i + 1) begin
             assign debug[i][31:24] = mem3[i];
             assign debug[i][23:16] = mem2[i];
             assign debug[i][15:8] = mem1[i];
             assign debug[i][7:0] = mem0[i];
         end
-    endgenerate 
+    endgenerate
+    */
 
-    logic [9:0] w_address; // 9-bit address for now
+    logic [9:0] w_address; // 10-bit address for now
     assign w_address = i_address[11:2];
 
     always @(posedge i_clk) begin

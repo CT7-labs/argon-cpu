@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 
     // Simulation
     simClock(1); // initial instruction load
-    for (int j = 0; j < 6; j++) {
+    for (int j = 0; j < 20; j++) {
         simClock(5); // instruction
     }
 
