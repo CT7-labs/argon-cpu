@@ -80,6 +80,7 @@ module Argon (
     logic [31:0] w_branch_offset;
     logic [25:0] w_jtarg26;
     logic [31:0] w_jump_target;
+    logic w_flag_equal, w_flag_notequal;
 
     assign w_sign_ext_imm = {{16{w_imm16[15]}}, w_imm16};
     assign w_zero_ext_imm = {16'b0, w_imm16};
@@ -87,6 +88,8 @@ module Argon (
     assign w_branch_offset = {{14{w_imm16[13]}}, w_imm16, 2'b00}; // 32-bit offset immediate for branching
     assign w_jtarg26  = r_instruction[31:6];   // 26-bit jump target
     assign w_jump_target = {r_pc[31:28], w_jtarg26, 2'b0}; // 32-bit jump address
+    assign w_flag_equal = (w_registers_portA == w_registers_portB);
+    assign w_flag_notequal = ~w_flag_equal;
 
     // assignments
     logic r_mux_mem_addr;
@@ -187,8 +190,8 @@ module Argon (
             r_alu_opcode <= ALUOP_ADD;
             mux_alu_srcA <= ALU_SRC_A_PC;
 
-            if (w_opcode == 8 && w_alu_flag_equal) mux_alu_srcB <= ALU_SRC_B_BRANCH;
-            else if (w_opcode == 9 && w_alu_flag_notequal) mux_alu_srcB <= ALU_SRC_B_BRANCH;
+            if (w_opcode == 8 && w_flag_equal) mux_alu_srcB <= ALU_SRC_B_BRANCH;
+            else if (w_opcode == 9 && w_flag_notequal) mux_alu_srcB <= ALU_SRC_B_BRANCH;
             else mux_alu_srcB <= ALU_SRC_B_PC_INC;
             
             // setup for memory stage
@@ -262,7 +265,6 @@ module Argon (
     logic [1:0] mux_alu_srcB;
     logic [3:0] r_alu_opcode;
     logic [31:0] w_alu_wordA, w_alu_wordB, w_alu_output;
-    logic w_alu_flag_equal, w_alu_flag_notequal;
 
     // ALU input multiplexing
     always_comb begin
@@ -286,10 +288,7 @@ module Argon (
 
         .i_wordA(w_alu_wordA),
         .i_wordB(w_alu_wordB),
-        .o_output(w_alu_output),
-
-        .o_flag_equal(w_alu_flag_equal),
-        .o_flag_notequal(w_alu_flag_notequal)
+        .o_output(w_alu_output)
     );
     
 endmodule

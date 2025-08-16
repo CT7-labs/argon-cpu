@@ -25,10 +25,7 @@ module ALU (
     input logic [31:0]   i_wordA,
     input logic [31:0]   i_wordB,
     input logic [4:0]    i_shamt,
-    output logic [31:0]  o_output,
-
-    output logic o_flag_equal,
-    output logic o_flag_notequal
+    output logic [31:0]  o_output
 );
     logic debug_invalid_opcode;
 
@@ -53,9 +50,6 @@ module ALU (
             ALUOP_SRLV:     o_output = i_wordA >> i_wordB[4:0];
             ALUOP_SRAV:     o_output = i_wordA >>> i_wordB[4:0];
         endcase
-
-        o_flag_equal = i_wordA == i_wordB;
-        o_flag_notequal = i_wordA != i_wordB;
     end
     
 endmodule
