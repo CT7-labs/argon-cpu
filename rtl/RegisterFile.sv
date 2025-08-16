@@ -14,6 +14,9 @@ module RegisterFile (
 
     reg [31:0] file [1:31];
 
+    logic [31:0] debug_reg /*verilator public_flat_rd*/;
+    assign debug_reg = file[31];
+
     assign o_portA = (i_selectA > 0) ? file[i_selectA] : 32'h0;
     assign o_portB = (i_selectB > 0) ? file[i_selectB] : 32'h0; 
 

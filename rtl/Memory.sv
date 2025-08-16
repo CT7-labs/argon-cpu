@@ -32,7 +32,7 @@ module Memory (
         
         reg [31:0] test1 [0:1023];
 
-        $readmemh("rtl/counter.o", test1);
+        $readmemh("assembler/src/counter.o", test1);
 
         for (integer i = 0; i < 1023; i = i + 1) begin
             mem0[i] <= test1[i][31:24];

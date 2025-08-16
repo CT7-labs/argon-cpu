@@ -1,4 +1,5 @@
 *.fst
 *.gtkw
+!argontest.gtkw
 sim/
 __pycache__/

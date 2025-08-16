@@ -84,7 +84,8 @@ int main(int argc, char** argv) {
     }
 
     // Cleanup
-    std::cout << "Simulation complete, clock cycles: " << clock_count << "\n";
+    std::cout << "Simulation complete, clock cycles: " << clock_count << "\n";\
+    std::cout << top->debug_reg << "\n";
     tfp->close();
     delete tfp;
     delete top;

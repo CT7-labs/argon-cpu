@@ -1,0 +1,92 @@
+ARGON_VERSION = "0.6"
+CONFIG_VERSION = "0.1"
+
+# Instruction type definitions
+[ITYPE.R]
+operands = ["reg", "reg", "reg"]
+
+[ITYPE.I]
+operands = ["reg", "reg", "imm16"]
+
+[ITYPE.J]
+operands = ["jtarg26"]
+
+# Opcode definitions
+[OPCODES.add]
+type = "R"
+opcode = 1
+funct6 = 0
+shamt = false
+
+[OPCODES.sub]
+type = "R"
+opcode = 1
+funct6 = 1
+shamt = false
+
+[OPCODES.sll]
+type = "R"
+opcode = 1
+funct6 = 8
+shamt = true
+
+[OPCODES.bne]
+type = "I"
+opcode = 9
+
+[OPCODES.addi]
+type = "I"
+opcode = 2
+
+[OPCODES.ori]
+type = "I"
+opcode = 5
+
+[OPCODES.jmp]
+type = "J"
+opcode = 17
+
+
+# Directive definitions
+[DIRECTIVES.equ]
+operands = ["symbol", "imm"]
+
+[DIRECTIVES.macro]
+operands = ["symbol"]
+
+[DIRECTIVES.endm]
+
+# Register definitions
+[REGISTERS]
+0 = ["r0", "zero"]
+1 = ["r1", "a0"]
+2 = ["r2", "a1"]
+3 = ["r3", "a2"]
+4 = ["r4", "a3"]
+5 = ["r5", "v0"]
+6 = ["r6", "v1"]
+7 = ["r7", "s0"]
+8 = ["r8", "s1"]
+9 = ["r9", "s2"]
+10 = ["r10", "s3"]
+11 = ["r11", "s4"]
+12 = ["r12", "s5"]
+13 = ["r13", "s6"]
+14 = ["r14", "s7"]
+15 = ["r15", "t0"]
+16 = ["r16", "t1"]
+17 = ["r17", "t2"]
+18 = ["r18", "t3"]
+19 = ["r19", "t4"]
+20 = ["r20", "t5"]
+21 = ["r21", "t6"]
+22 = ["r22", "t7"]
+23 = ["r23", "gp"]
+24 = ["r24", "sp"]
+25 = ["r25", "st"]
+26 = ["r26", "is"]
+27 = ["r27", "ra"]
+28 = ["r28", "porta"]
+29 = ["r29", "ddira"]
+30 = ["r30", "portb"]
+31 = ["r31", "ddirb"]

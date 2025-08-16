@@ -36,7 +36,7 @@ bytes from the MMU too.
 
 # Register file
 ### r0 (zero)
-Read-only zero
+Hardwired zero
 
 ### r1-4 (a0-3)
 Function arguments (caller)
@@ -50,30 +50,17 @@ General purpose saved registers (caller)
 ### r15-22 (t0-7)
 General purpose temporary registers (callee)
 
-### r23-27
+### r23-25
 Special registers
 - Global pointer (gp)
 - Stack pointer (sp)
-- Status register (st)
-- Interrupt status (is)
 - Return address (ra)
 
-Status register:
-- halt (0)
-- error (1)
-- reserved (3-31)
+### r26-r29 (i0-i1)
+Interrupt scratch registers (for handling interrupts without saving registers)
 
-### r28-31
-I/O registers (map to 64 pins with direction control)
-
-porta
-ddira
-portb
-ddirb
-
-*technically* it's "6" registers, but the programmmer sees 4 because the "read only" and "write only" registers are merged.
-Reading from the PORTA register returns the value from the "read only" register, and writing to the PORTA register sets
-the value in "write only" register.
+### r30-r31 (k0-k3)
+Kernel registers
 
 # Opcodes
 ### ALU arithmetic

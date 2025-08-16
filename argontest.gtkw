@@ -1,0 +1,245 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Sat Aug 16 21:35:26 2025
+[*]
+[dumpfile] "/home/prestonz/sonder/verilog/argon06/dump.fst"
+[dumpfile_mtime] "Sat Aug 16 21:34:58 2025"
+[dumpfile_size] 2947
+[savefile] "/home/prestonz/sonder/verilog/argon06/argontest.gtkw"
+[timestart] 33
+[size] 2560 1467
+[pos] -1 -1
+*-1.888969 33 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.ArgonTB.
+[treeopen] TOP.ArgonTB.argon_inst.
+[treeopen] TOP.ArgonTB.argon_inst.alu_inst.
+[treeopen] TOP.ArgonTB.memory_inst.
+[sst_width] 221
+[signals_width] 357
+[sst_expanded] 1
+[sst_vpaned_height] 445
+@200
+-Argon
+@28
+TOP.ArgonTB.argon_inst.i_clk
+TOP.ArgonTB.argon_inst.i_halt
+TOP.ArgonTB.argon_inst.sys_clk
+TOP.ArgonTB.argon_inst.i_reset
+@200
+-
+-Memory Port
+@22
+TOP.ArgonTB.argon_inst.i_mem_rd_data[31:0]
+TOP.ArgonTB.argon_inst.o_mem_addr[31:0]
+@28
+TOP.ArgonTB.argon_inst.o_mem_rd_mask[2:0]
+@22
+TOP.ArgonTB.argon_inst.o_mem_wr_data[31:0]
+@28
+TOP.ArgonTB.argon_inst.o_mem_wr_mask[1:0]
+@200
+-
+-Finite State Machine
+@28
+[color] 2
+TOP.ArgonTB.argon_inst.r_stage[2:0]
+@22
+[color] 3
+TOP.ArgonTB.argon_inst.r_pc[31:0]
+@c00022
+[color] 1
+TOP.ArgonTB.argon_inst.r_instruction[31:0]
+@28
+(0)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(1)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(2)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(3)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(4)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(5)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(6)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(7)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(8)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(9)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(10)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(11)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(12)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(13)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(14)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(15)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(16)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(17)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(18)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(19)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(20)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(21)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(22)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(23)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(24)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(25)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(26)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(27)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(28)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(29)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(30)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+(31)TOP.ArgonTB.argon_inst.r_instruction[31:0]
+@1401200
+-group_end
+@22
+TOP.ArgonTB.argon_inst.w_opcode[5:0]
+TOP.ArgonTB.argon_inst.w_funct6[5:0]
+@200
+-
+@28
+TOP.ArgonTB.argon_inst.r_registers_write_en
+TOP.ArgonTB.argon_inst.w_alu_flag_equal
+TOP.ArgonTB.argon_inst.w_alu_flag_notequal
+@22
+TOP.ArgonTB.argon_inst.w_imm16[15:0]
+TOP.ArgonTB.argon_inst.w_rd[4:0]
+TOP.ArgonTB.argon_inst.w_rs[4:0]
+TOP.ArgonTB.argon_inst.w_rt[4:0]
+TOP.ArgonTB.argon_inst.w_jump_target[31:0]
+TOP.ArgonTB.argon_inst.w_pc_inc[31:0]
+TOP.ArgonTB.argon_inst.w_shamt[4:0]
+TOP.ArgonTB.argon_inst.w_sign_ext_imm[31:0]
+TOP.ArgonTB.argon_inst.w_zero_ext_imm[31:0]
+TOP.ArgonTB.argon_inst.w_lui_imm[31:0]
+@200
+-
+-
+-FSM - Debug
+-
+-FSM - ALU
+@22
+TOP.ArgonTB.argon_inst.r_alu_opcode[3:0]
+[color] 2
+TOP.ArgonTB.argon_inst.w_alu_output[31:0]
+[color] 3
+TOP.ArgonTB.argon_inst.r_alu_result[31:0]
+@28
+TOP.ArgonTB.argon_inst.mux_alu_srcA
+TOP.ArgonTB.argon_inst.mux_imm16
+TOP.ArgonTB.argon_inst.mux_alu_srcB[1:0]
+@200
+-
+-FSM - Register File
+@28
+TOP.ArgonTB.argon_inst.mux_wb_src[1:0]
+@200
+-
+-ALU
+@28
+TOP.ArgonTB.argon_inst.alu_inst.i_clk
+TOP.ArgonTB.argon_inst.alu_inst.o_flag_equal
+TOP.ArgonTB.argon_inst.alu_inst.o_flag_notequal
+@22
+TOP.ArgonTB.argon_inst.alu_inst.i_wordA[31:0]
+TOP.ArgonTB.argon_inst.alu_inst.i_wordB[31:0]
+TOP.ArgonTB.argon_inst.alu_inst.i_opcode[3:0]
+TOP.ArgonTB.argon_inst.alu_inst.i_shamt[4:0]
+@200
+-
+-
+-ALU - Debug
+@28
+TOP.ArgonTB.argon_inst.alu_inst.debug_invalid_opcode
+@200
+-
+-Register File
+@28
+TOP.ArgonTB.argon_inst.registerfile_inst.i_clk
+TOP.ArgonTB.argon_inst.registerfile_inst.i_reset
+@22
+TOP.ArgonTB.argon_inst.registerfile_inst.i_selectA[4:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.i_selectB[4:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.i_selectW[4:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.o_portA[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.o_portB[31:0]
+@28
+[color] 2
+TOP.ArgonTB.argon_inst.registerfile_inst.i_write_en
+@22
+TOP.ArgonTB.argon_inst.registerfile_inst.i_portW[31:0]
+@200
+-
+-Register File - Registers
+@22
+TOP.ArgonTB.argon_inst.registerfile_inst.file(1)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(2)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(3)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(4)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(5)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(6)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(7)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(8)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(9)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(10)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(11)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(12)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(13)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(14)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(15)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(16)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(17)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(18)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(19)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(20)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(21)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(22)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(23)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(24)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(25)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(26)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(27)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(28)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(29)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(30)[31:0]
+TOP.ArgonTB.argon_inst.registerfile_inst.file(31)[31:0]
+@28
+TOP.ArgonTB.i_clk
+TOP.ArgonTB.i_halt
+TOP.ArgonTB.i_reset
+@22
+TOP.ArgonTB.memory_inst.debug(0)[31:0]
+TOP.ArgonTB.memory_inst.debug(1)[31:0]
+TOP.ArgonTB.memory_inst.debug(2)[31:0]
+TOP.ArgonTB.memory_inst.debug(3)[31:0]
+@23
+TOP.ArgonTB.memory_inst.debug(4)[31:0]
+@22
+TOP.ArgonTB.memory_inst.debug(5)[31:0]
+TOP.ArgonTB.memory_inst.i_address[31:0]
+@28
+TOP.ArgonTB.memory_inst.i_clk
+TOP.ArgonTB.memory_inst.i_rd_mask[2:0]
+TOP.ArgonTB.memory_inst.i_reset
+@22
+TOP.ArgonTB.memory_inst.i_wr_data[31:0]
+@28
+TOP.ArgonTB.memory_inst.i_wr_mask[1:0]
+TOP.ArgonTB.memory_inst.o_err_address_misaligned
+TOP.ArgonTB.memory_inst.o_err_invalid_read_mask
+@22
+TOP.ArgonTB.memory_inst.o_rd_data[31:0]
+@420
+TOP.ArgonTB.memory_inst.unnamedblk1.unnamedblk2.i
+@22
+TOP.ArgonTB.memory_inst.w_address[9:0]
+TOP.ArgonTB.w_mem_address[31:0]
+@28
+TOP.ArgonTB.w_mem_err_address_misaligned
+TOP.ArgonTB.w_mem_err_invalid_read_mask
+@22
+TOP.ArgonTB.w_mem_rd_data[31:0]
+@28
+TOP.ArgonTB.w_mem_rd_mask[2:0]
+@22
+TOP.ArgonTB.w_mem_wr_data[31:0]
+@28
+TOP.ArgonTB.w_mem_wr_mask[1:0]
+TOP.i_clk
+TOP.i_halt
+TOP.i_reset
+[pattern_trace] 1
+[pattern_trace] 0
