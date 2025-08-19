@@ -1,4 +1,4 @@
-a# Argon v0.6
+# Argon v0.6
 Custom CPU with heavy inspiration drawn from MIPS to be implemented on an iCE40HX8K
 
 ### Quick spec sheet

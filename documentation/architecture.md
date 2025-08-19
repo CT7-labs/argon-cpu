@@ -56,11 +56,11 @@ Special registers
 - Stack pointer (sp)
 - Return address (ra)
 
-### r26-r29 (i0-i1)
-Interrupt scratch registers (for handling interrupts without saving registers)
-
-### r30-r31 (k0-k3)
-Kernel registers
+### r26-r21 (i0-i5)
+Misc. registers that could be used for
+- interrupt scratchpad
+- kernel variables
+- register saving
 
 # Opcodes
 ### ALU arithmetic
